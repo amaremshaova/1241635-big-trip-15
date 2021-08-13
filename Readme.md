@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Анастасия Маремшаова](https://up.htmlacademy.ru/ecmascript/15/user/1241635).
-* Наставник: `Неизвестно`.
+* Наставник: [Rail Sakhaviev] (https://htmlacademy.ru/profile/id1331891).
 
 ---
 
