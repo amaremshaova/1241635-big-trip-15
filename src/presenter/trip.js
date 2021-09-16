@@ -5,7 +5,7 @@ import PointListView from '../view/point-list.js';
 import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import PointNewPresenter from './point-new.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
-import {SortType, UpdateType, UserAction, FilterType, MenuItem} from '../const.js';
+import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import LoadingView from '../view/loading.js';
 import {filter} from '../utils/filter.js';
 

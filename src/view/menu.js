@@ -33,8 +33,8 @@ export default class Menu extends AbstractView {
     this.getElement().addEventListener('click', this._menuClickHandler);
   }
 
-  setMenuItem(menuItem) {
+/* setMenuItem(menuItem) {
     const item = this.getElement().querySelector(`[name=${menuItem}]`);
 
-  }
+  }*/
 }

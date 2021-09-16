@@ -1,5 +1,4 @@
 import SiteMenuView from './view/menu.js';
-import FilterView from './view/filters.js';
 import CostTripView from './view/cost-trip.js';
 import InfoTripView from './view/info-trip.js';
 import StatisticsView from './view/statisticts.js';
