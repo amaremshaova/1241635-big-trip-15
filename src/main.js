@@ -35,7 +35,7 @@ const filterPresenter = new FilterPresenter(headerFiltersElement, filterModel, p
 
 const handlePointNewFormClose = () => {
   //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.TABLE}]`).disabled = false;
-  siteMenuComponent.setMenuItem(MenuItem.TABLE);
+  //siteMenuComponent.setMenuItem(MenuItem.TABLE);
 };
 
 let statisticsComponent = null;
@@ -53,14 +53,6 @@ const handleAddPointBtnClick = () => {
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
-   /*case MenuItem.ADD_NEW_POINT:
-      remove(statisticsComponent);
-      tripPresenter.destroy();
-      filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-      tripPresenter.init();
-      tripPresenter.createPoint(handlePointNewFormClose);
-      siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
-      break;*/
     case MenuItem.TABLE:
       tripPresenter.destroy();
       tripPresenter.init();

@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
+import { BLANK_POINT } from '../const.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { getOffersArray, getDestinationsArray } from '../utils/point.js';
-
 
 
 const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
@@ -109,7 +109,7 @@ const createEditingFormTemplate = (point, cities) => {
       <label class="event__label  event__type-output" for="event-destination-1">
         ${type[0].toUpperCase() + type.slice(1)}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${destination.name} list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${isDestination ? destination.name : cities[0]}" list="destination-list-1">
       <datalist class="destination-list" id="destination-list-1">
       ${cities.map((city) => `<option class="destination-list__option" value="${city}">${city}</option>`).join('')}
       </datalist>
@@ -132,7 +132,8 @@ const createEditingFormTemplate = (point, cities) => {
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__reset-btn" type="reset">${isDestination ? 'Delete' : 'Cancel'}</button>
+
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
     </button>
@@ -148,6 +149,11 @@ const createEditingFormTemplate = (point, cities) => {
 export default class PointEdit extends SmartView {
   constructor(point, offersAll, destinationsAll, citiesAll) {
     super();
+
+    if (point === BLANK_POINT){
+      point.offers = getOffersArray(offersAll, point.type);
+    }
+
     this._data = PointEdit.parsePointToData(point);
     this._dateFromPicker = null;
     this._dateToPicker = null;
@@ -160,9 +166,7 @@ export default class PointEdit extends SmartView {
 
     this._typeToggleHandler = this._typeToggleHandler.bind(this);
     this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
-
     this._priceToggleHandler = this._priceToggleHandler.bind(this);
-
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
@@ -272,6 +276,7 @@ export default class PointEdit extends SmartView {
   }
 
   static parsePointToData(point) {
+    console.log(point.destination.length);
     return Object.assign(
       {},
       point,
@@ -287,15 +292,15 @@ export default class PointEdit extends SmartView {
     data = Object.assign({}, data);
 
     if (!data.isOffers) {
-      data.offers = null;
+      data.offers = [];
     }
 
     if (!data.isDestination) {
-      data.destination = null;
+      data.destination = [];
     }
 
     if (!data.isPictures) {
-      data.destination.pictures = null;
+      data.destination.pictures = [];
     }
 
     delete data.isOffers;

@@ -1,16 +1,7 @@
 import PointEditView from '../view/point-edit.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
-import dayjs from 'dayjs';
-
-const BLANK_POINT = {
-  basePrice : 0,
-  dateFrom : dayjs(),
-  dateTo : dayjs(),
-  type :'taxi',
-  destination : [],
-  offers : [],
-};
+import { BLANK_POINT } from '../const.js';
 
 
 export default class PointNew {
@@ -22,7 +13,7 @@ export default class PointNew {
     this._destroyCallback = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -35,11 +26,13 @@ export default class PointNew {
 
     this._pointEditComponent = new PointEditView(BLANK_POINT, destinations, offers, cities);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointEditComponent.setDeleteClickHandler(this._handleCloseClick);
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+
+
   }
 
   destroy() {
@@ -84,7 +77,7 @@ export default class PointNew {
     );
   }
 
-  _handleDeleteClick() {
+  _handleCloseClick() {
     this.destroy();
   }
 

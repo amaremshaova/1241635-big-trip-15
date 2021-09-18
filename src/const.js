@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const SortType = {
   DAY: 'day-down',
   TIME: 'time-down',
@@ -31,3 +33,12 @@ export const MenuItem = {
 };
 
 export const OFFER_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
+export const BLANK_POINT = {
+  basePrice : 0,
+  dateFrom : dayjs(),
+  dateTo : dayjs(),
+  type :'taxi',
+  destination : [],
+  offers : [],
+};
