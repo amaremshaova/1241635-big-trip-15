@@ -9,7 +9,7 @@ const Method = {
 
 const SuccessHTTPStatusRange = {
   MIN: 200,
-  MAX: 299,
+  MAX: 400,
 };
 
 export default class Api {
@@ -67,8 +67,10 @@ export default class Api {
     body = null,
     headers = new Headers(),
   }) {
-    headers.append('Authorization', this._authorization);
 
+
+    headers.append('Authorization', this._authorization);
+    console.log(body);
     return fetch(
       `${this._endPoint}/${url}`,
       {method, body, headers},

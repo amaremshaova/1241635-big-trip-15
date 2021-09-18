@@ -15,7 +15,7 @@ import { getCostTrip } from './utils/get-cost.js';
 import { UpdateType, FilterType } from './const.js';
 
 
-const AUTHORIZATION = 'Basic er883jdzbdw';
+const AUTHORIZATION = 'Basic kTy9gIdsz2317rD';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
 
 const headerMainElement = document.querySelector('.trip-main');
@@ -43,8 +43,10 @@ let statisticsComponent = null;
 const handleAddPointBtnClick = () => {
   remove(statisticsComponent);
   tripPresenter.destroy();
+
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
+
   tripPresenter.createPoint(handlePointNewFormClose);
   //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
 };
@@ -91,26 +93,25 @@ const createInfoModel = (infoData) => {
   render(headerMainElement, infoSectionElement, RenderPosition.AFTERBEGIN);
 };
 
-
 filterPresenter.init();
 
-
 api.getDestinations()
-  .then((destinations) => {
-    console.log(destinations);
-    pointsModel.setDestinations(destinations);
+  .then((destinationsData) => {
+    pointsModel.setDestinations(destinationsData);
   })
-  .then(() => {api.getOffers()
-    .then((offers) => {
+  .then(() => {
+    api.getOffers().then((offersData) => {
+      pointsModel.setOffers(offersData);
 
-      pointsModel.setOffers(offers);
-    });})
+    });
+  })
   .then(() => {api.getPoints()
     .then((points) => {
-      console.log(points);
       createInfoModel(createInfoData(points));
+      addPointButton.addEventListener('click', handleAddPointBtnClick);
       filterPresenter.init();
       pointsModel.setPoints(UpdateType.INIT, points);
+
       render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
       siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
     });

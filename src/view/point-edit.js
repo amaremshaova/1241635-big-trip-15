@@ -5,16 +5,6 @@ import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { getOffersArray, getDestinationsArray } from '../utils/point.js';
 
-const BLANK_POINT = {
-  basePrice : 0,
-  dateFrom : '',
-  dateTo : '',
-  type :'taxi',
-  destination : {
-    pictures : [],
-  },
-  offers : {},
-};
 
 
 const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
@@ -33,9 +23,8 @@ const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
     </div></section>` : ''}`;
 
 
-const createPointEditDestinationTemplate = (destination, isDestination, isPictures) => {
-  console.log(destination.description);
-  return `${isDestination ?
+const createPointEditDestinationTemplate = (destination, isDestination, isPictures) =>
+  `${isDestination ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">
@@ -46,17 +35,16 @@ const createPointEditDestinationTemplate = (destination, isDestination, isPictur
       </div>
     </div>` : ''}
     </section>`  : ''}`;
-};
 
 
 const createEditingFormTemplate = (point, cities) => {
 
-const {type, offers, dateFrom, dateTo, basePrice, destination, isOffers, isDestination, isPictures} = point;
-const offersTemplate = createPointEditOffersTemplate(offers, isOffers);
-const destinationTemplate = createPointEditDestinationTemplate(destination, isDestination, isPictures);
+  const {type, offers, dateFrom, dateTo, basePrice, destination, isOffers, isDestination, isPictures} = point;
+  const offersTemplate = createPointEditOffersTemplate(offers, isOffers);
+  const destinationTemplate = createPointEditDestinationTemplate(destination, isDestination, isPictures);
 
 
-return `<li class="trip-events__item">
+  return `<li class="trip-events__item">
 <form class="event event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
@@ -153,12 +141,12 @@ return `<li class="trip-events__item">
   ${offersTemplate}
   ${destinationTemplate}
   </section>
-</form>
-</li>`};
+</form></li>`;
+};
 
 
 export default class PointEdit extends SmartView {
-  constructor(point = BLANK_POINT, offersAll, destinationsAll, citiesAll) {
+  constructor(point, offersAll, destinationsAll, citiesAll) {
     super();
     this._data = PointEdit.parsePointToData(point);
     this._dateFromPicker = null;
@@ -172,6 +160,9 @@ export default class PointEdit extends SmartView {
 
     this._typeToggleHandler = this._typeToggleHandler.bind(this);
     this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
+
+    this._priceToggleHandler = this._priceToggleHandler.bind(this);
+
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
@@ -180,6 +171,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
+    console.log(this._cities);
     return createEditingFormTemplate(this._data, this._cities);
   }
 
@@ -239,10 +231,13 @@ export default class PointEdit extends SmartView {
     collectionTypeElements.forEach((item) => item.addEventListener('click', this._typeToggleHandler));
     const collectionDestinationElements = this.getElement().querySelector('.event__input--destination');
     collectionDestinationElements.addEventListener('change', this._destinationToggleHandler);
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    priceInputElement.addEventListener('change', this._priceToggleHandler);
   }
 
   _typeToggleHandler(evt) {
     evt.preventDefault();
+    console.log(this._offers)
     const offersType = getOffersArray(this._offers, evt.target.dataset.type);
     this.updateData({
       type: evt.target.dataset.type,
@@ -259,7 +254,14 @@ export default class PointEdit extends SmartView {
     });
   }
 
+  _priceToggleHandler(evt) {
+    this.updateData({
+      basePrice: evt.target.value,
+    });
+  }
+
   _formSubmitHandler(evt) {
+
     evt.preventDefault();
     this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }

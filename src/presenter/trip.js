@@ -46,6 +46,11 @@ export default class Trip {
   }
 
   init() {
+
+    this._destinations = this._getDestinations();
+    this._offers = this._getOffers();
+    this._getCities(this._destinations);
+
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
@@ -62,7 +67,7 @@ export default class Trip {
   }
 
   createPoint(callback) {
-    this._pointNewPresenter.init(callback);
+    this._pointNewPresenter.init(callback, this._offers, this._destinations, this._cities);
   }
 
   _getOffers() {
@@ -189,11 +194,8 @@ export default class Trip {
   }
 
   _renderPoints(points) {
-    const destinations = this._getDestinations();
-    const offers = this._getOffers();
-    this._getCities(destinations);
 
-    points.forEach((point) => this._renderPoint(point, destinations, offers));
+    points.forEach((point) => this._renderPoint(point, this._destinations, this._offers));
   }
 
   _renderLoading() {

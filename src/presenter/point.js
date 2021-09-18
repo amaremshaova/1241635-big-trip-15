@@ -39,8 +39,6 @@ export default class Point {
     this._destinations = destinations;
     this._cities = this.uniqueCities(cities);
 
-
-
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
@@ -171,14 +169,18 @@ export default class Point {
 
   _handleFormSubmit(update) {
 
+    console.log(11111111)
+
     const isMinorUpdate =
       isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
       ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);
 
-    this._changeData( UserAction.UPDATE_point,
+      console.log(isMinorUpdate);
+    this._replaceFormToCard();
+    this._changeData( UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update);
-    this._replaceFormToCard();
+
   }
 
   _handleDeleteClick(point) {
