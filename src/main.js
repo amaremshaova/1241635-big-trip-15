@@ -22,12 +22,13 @@ const headerMainElement = document.querySelector('.trip-main');
 const headerNavigationElement = headerMainElement.querySelector('.trip-controls__navigation');
 const headerFiltersElement = headerMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
+const addPointButton = document.querySelector('.trip-main__event-add-btn');
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
-const menuModel = new MenuModel();
+//const menuModel = new MenuModel();
 const siteMenuComponent = new SiteMenuView(MenuItem.TABLE);
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(headerFiltersElement, filterModel, pointsModel);
@@ -39,17 +40,27 @@ const handlePointNewFormClose = () => {
 
 let statisticsComponent = null;
 
+const handleAddPointBtnClick = () => {
+  remove(statisticsComponent);
+  tripPresenter.destroy();
+  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+  tripPresenter.init();
+  tripPresenter.createPoint(handlePointNewFormClose);
+  //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
+};
+
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
-    case MenuItem.ADD_NEW_POINT:
+   /*case MenuItem.ADD_NEW_POINT:
       remove(statisticsComponent);
       tripPresenter.destroy();
       filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       tripPresenter.init();
       tripPresenter.createPoint(handlePointNewFormClose);
       siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
-      break;
+      break;*/
     case MenuItem.TABLE:
+      tripPresenter.destroy();
       tripPresenter.init();
       remove(statisticsComponent);
       filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
@@ -82,18 +93,21 @@ const createInfoModel = (infoData) => {
 
 
 filterPresenter.init();
-tripPresenter.init();
+
 
 api.getDestinations()
   .then((destinations) => {
+    console.log(destinations);
     pointsModel.setDestinations(destinations);
   })
   .then(() => {api.getOffers()
     .then((offers) => {
+
       pointsModel.setOffers(offers);
     });})
   .then(() => {api.getPoints()
     .then((points) => {
+      console.log(points);
       createInfoModel(createInfoData(points));
       filterPresenter.init();
       pointsModel.setPoints(UpdateType.INIT, points);
@@ -109,3 +123,4 @@ api.getDestinations()
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
 
+tripPresenter.init();

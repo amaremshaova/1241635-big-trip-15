@@ -39,6 +39,8 @@ export default class Point {
     this._destinations = destinations;
     this._cities = this.uniqueCities(cities);
 
+
+
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
@@ -70,7 +72,7 @@ export default class Point {
   }
 
   uniqueCities(cities){
-    let set = new Set(cities);
+    const set = new Set(cities);
     return Array.from(set);
   }
 

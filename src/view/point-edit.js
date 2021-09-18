@@ -3,7 +3,7 @@ import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-import { getOffersArray } from '../utils/point.js';
+import { getOffersArray, getDestinationsArray } from '../utils/point.js';
 
 const BLANK_POINT = {
   basePrice : 0,
@@ -20,8 +20,8 @@ const BLANK_POINT = {
 const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-    ${offers.map((offer, index) =>`<div class="event__available-offers">
+    <div class="event__available-offers">
+    ${offers.map((offer, index) =>`
       <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" checked>
         <label class="event__offer-label" for="event-offer-${index}">
@@ -29,25 +29,24 @@ const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
         </label>
-      </div>
-    </div>`)}
-  </section>` : ''}`;
+      </div>`).join('')}
+    </div></section>` : ''}`;
 
 
-const createPointEditDestinationTemplate = (destination, isDestination, isPictures) => (
-
-  `${isDestination ?
+const createPointEditDestinationTemplate = (destination, isDestination, isPictures) => {
+  console.log(destination.description);
+  return `${isDestination ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">
       ${destination.description}</p>
       ${isPictures ? `<div class="event__photos-container">
       <div class="event__photos-tape">
-        ${destination.pictures.map((photo) =>`<img class="event__photo" src=${photo.src} alt=${photo.description}>`)}
+        ${destination.pictures.map((photo) =>`<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join('')}
       </div>
     </div>` : ''}
-    </section>`  : ''}`
-);
+    </section>`  : ''}`;
+};
 
 
 const createEditingFormTemplate = (point, cities) => {
@@ -91,11 +90,6 @@ return `<li class="trip-events__item">
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${type === 'transport' ? 'checked' : ''}>
-            <label class="event__type-label  event__type-label--transport" data-type="transport" for="event-type-transport-1">Transport</label>
-          </div>
-
-          <div class="event__type-item">
             <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${type === 'drive' ? 'checked' : ''}>
             <label class="event__type-label  event__type-label--drive" data-type="drive" for="event-type-drive-1">Drive</label>
           </div>
@@ -128,8 +122,8 @@ return `<li class="trip-events__item">
         ${type[0].toUpperCase() + type.slice(1)}
       </label>
       <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${destination.name} list="destination-list-1">
-      <datalist id="destination-list-1">
-      ${cities.map((city) => `<option value="${city}">${city}</option>`).join('')}
+      <datalist class="destination-list" id="destination-list-1">
+      ${cities.map((city) => `<option class="destination-list__option" value="${city}">${city}</option>`).join('')}
       </datalist>
     </div>
 
@@ -169,14 +163,15 @@ export default class PointEdit extends SmartView {
     this._data = PointEdit.parsePointToData(point);
     this._dateFromPicker = null;
     this._dateToPicker = null;
+
     this._offers = offersAll;
     this._destinations = destinationsAll;
     this._cities = citiesAll;
 
-
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
 
     this._typeToggleHandler = this._typeToggleHandler.bind(this);
+    this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
@@ -242,29 +237,27 @@ export default class PointEdit extends SmartView {
   _setInnerHandlers() {
     const collectionTypeElements = this.getElement().querySelectorAll('.event__type-label');
     collectionTypeElements.forEach((item) => item.addEventListener('click', this._typeToggleHandler));
-    const destinationsContainer = this.getElement().querySelector('.event__field-group--destination');
-    //destinationsContainer.forEach((item) => ite)
+    const collectionDestinationElements = this.getElement().querySelector('.event__input--destination');
+    collectionDestinationElements.addEventListener('change', this._destinationToggleHandler);
   }
 
   _typeToggleHandler(evt) {
     evt.preventDefault();
-    console.log(getOffersArray(this._offers, evt.target.dataset.type));
+    const offersType = getOffersArray(this._offers, evt.target.dataset.type);
     this.updateData({
       type: evt.target.dataset.type,
-      offers: getOffersArray(this._offers, evt.target.dataset.type),
-      isOffers: !this._data.isOffers,
+      offers: offersType,
+      isOffers: offersType.length !== 0 ,
     });
   }
 
   _destinationToggleHandler(evt) {
-    evt.preventDefault();
+    const destination = getDestinationsArray(this._destinations, evt.target.value);
     this.updateData({
-      type: evt.target.dataset.type,
-      //destinations: getDestinationsArray(this._offers, evt.target.dataset.type),
-      isOffers: !this._data.isOffers,
+      destination: destination,
+      isDestination: destination.length !== 0,
     });
   }
-
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
@@ -277,7 +270,6 @@ export default class PointEdit extends SmartView {
   }
 
   static parsePointToData(point) {
-
     return Object.assign(
       {},
       point,
@@ -313,7 +305,6 @@ export default class PointEdit extends SmartView {
 
   removeElement() {
     super.removeElement();
-
     if (this._datepicker) {
       this._datepicker.destroy();
       this._datepicker = null;

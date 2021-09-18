@@ -58,10 +58,17 @@ export const isPointPast = (dateFrom, dateTo) =>
 (dayjs(dateFrom).isBefore(dayjs()) && dayjs(dateTo).isAfter(dayjs())));
 
 export const getOffersArray = (offers, type) => {
-  const offersArray = offers.filter ((offer) => offer.type === type);
-  console.log(offersArray[0].offers);
+  console.log(offers);
+  const offersArray = offers.filter((offer) => offer.type === type);
+  console.log(offersArray);
 
   return offersArray[0].offers;
+};
+
+export const getDestinationsArray = (destinations, nameCity) => {
+  const destinationsArray = destinations.filter((destination) => destination.name === nameCity);
+
+  return destinationsArray[0];
 };
 
 

@@ -67,7 +67,7 @@ export default class PointNew {
 
   _handleFormSubmit(point) {
     this._changeData(
-      UserAction.ADD_point,
+      UserAction.ADD_POINT,
       UpdateType.MINOR,
       point,
     );

@@ -28,8 +28,6 @@ export default class Menu extends AbstractView {
 
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
-
-
     this.getElement().addEventListener('click', this._menuClickHandler);
   }
 

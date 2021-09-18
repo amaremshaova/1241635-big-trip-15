@@ -9,8 +9,8 @@ export default class Points extends AbstractObserver {
   }
 
   setOffers( offers) {
+    //console.log(offers)
     this._offers = offers.slice();
-
     //this._notify(updateType);
   }
 

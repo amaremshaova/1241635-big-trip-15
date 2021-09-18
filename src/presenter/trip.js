@@ -66,6 +66,7 @@ export default class Trip {
   }
 
   _getOffers() {
+
     return this._pointsModel.getOffers();
   }
 
