@@ -21,10 +21,12 @@ export default class Points extends AbstractObserver {
   setDestinations(destinations) {
     this._destinations = destinations.slice();
 
+
     //this._notify(updateType);
   }
 
   getDestinations() {
+    console.log(this);
     return this._destinations;
   }
 

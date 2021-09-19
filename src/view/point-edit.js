@@ -7,13 +7,17 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import { getOffersArray, getDestinationsArray } from '../utils/point.js';
 
 
-const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
+const createPointEditOffersTemplate = (offers, isOffers, offersMain) =>{
+  console.log(offers);
+  const titles = offers.map((offer) => offer.title);
+
+  return`${isOffers ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-    ${offers.map((offer, index) =>`
+    ${offersMain.map((offer, index) => `
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" checked>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${titles.includes(offer.title) ? 'checked' : ''} >
         <label class="event__offer-label" for="event-offer-${index}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -21,6 +25,7 @@ const createPointEditOffersTemplate = (offers, isOffers) => `${isOffers ? `
         </label>
       </div>`).join('')}
     </div></section>` : ''}`;
+};
 
 
 const createPointEditDestinationTemplate = (destination, isDestination, isPictures) =>
@@ -37,10 +42,12 @@ const createPointEditDestinationTemplate = (destination, isDestination, isPictur
     </section>`  : ''}`;
 
 
-const createEditingFormTemplate = (point, cities) => {
+const createEditingFormTemplate = (point, cities, offersMain) => {
+
+  console.log(offersMain);
 
   const {type, offers, dateFrom, dateTo, basePrice, destination, isOffers, isDestination, isPictures} = point;
-  const offersTemplate = createPointEditOffersTemplate(offers, isOffers);
+  const offersTemplate = createPointEditOffersTemplate(offers, isOffers, offersMain);
   const destinationTemplate = createPointEditDestinationTemplate(destination, isDestination, isPictures);
 
 
@@ -147,7 +154,7 @@ const createEditingFormTemplate = (point, cities) => {
 
 
 export default class PointEdit extends SmartView {
-  constructor(point, offersAll, destinationsAll, citiesAll) {
+  constructor(point, destinationsAll, offersAll, citiesAll) {
     super();
 
     if (point === BLANK_POINT){
@@ -159,6 +166,7 @@ export default class PointEdit extends SmartView {
     this._dateToPicker = null;
 
     this._offers = offersAll;
+
     this._destinations = destinationsAll;
     this._cities = citiesAll;
 
@@ -167,6 +175,7 @@ export default class PointEdit extends SmartView {
     this._typeToggleHandler = this._typeToggleHandler.bind(this);
     this._destinationToggleHandler = this._destinationToggleHandler.bind(this);
     this._priceToggleHandler = this._priceToggleHandler.bind(this);
+    this._offersToggleHandler = this._offersToggleHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
@@ -175,8 +184,8 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    console.log(this._cities);
-    return createEditingFormTemplate(this._data, this._cities);
+    const offersTypeMain = getOffersArray(this._offers, this._data.type);
+    return createEditingFormTemplate(this._data, this._cities, offersTypeMain );
   }
 
   restoreHandlers() {
@@ -201,7 +210,8 @@ export default class PointEdit extends SmartView {
       this._dateFromPicker = flatpickr(
         this.getElement().querySelector('.event__input--start-time'),
         {
-          dateFormat: 'Y/m/d H:i',
+          enableTime: true,
+          dateFormat: 'Y-m-d H:i',
           defaultDate: this._data.dataFrom,
           onChange: this._dataToChangeHandler, // На событие flatpickr передаём наш колбэк
         },
@@ -210,7 +220,8 @@ export default class PointEdit extends SmartView {
       this._dateToPicker = flatpickr(
         this.getElement().querySelector('.event__input--end-time'),
         {
-          dateFormat: 'Y/m/d H:i',
+          enableTime: true,
+          dateFormat: 'Y-m-d H:i',
           defaultDate: this._data.dataFrom,
           onChange: this._dataFromChangeHandler, // На событие flatpickr передаём наш колбэк
         },
@@ -237,17 +248,45 @@ export default class PointEdit extends SmartView {
     collectionDestinationElements.addEventListener('change', this._destinationToggleHandler);
     const priceInputElement = this.getElement().querySelector('.event__input--price');
     priceInputElement.addEventListener('change', this._priceToggleHandler);
+
+    const collectionOffersElements = this.getElement().querySelectorAll('.event__offer-checkbox');
+    collectionOffersElements.forEach((item) => item.addEventListener('change', this._offersToggleHandler));
+
   }
 
   _typeToggleHandler(evt) {
     evt.preventDefault();
-    console.log(this._offers)
+    console.log(this._offers);
     const offersType = getOffersArray(this._offers, evt.target.dataset.type);
     this.updateData({
       type: evt.target.dataset.type,
-      offers: offersType,
+      offers: [],
       isOffers: offersType.length !== 0 ,
     });
+  }
+
+  _offersToggleHandler(evt) {
+    evt.preventDefault();
+    evt.target.checked = !evt.target.checked;
+    const parent = evt.target.parentNode;
+    const label = parent.querySelector('.event__offer-label');
+    const titleData = label.querySelector('.event__offer-title').innerHTML;
+    const priceData = label.querySelector('.event__offer-price').innerHTML;
+
+    console.log(titleData);
+    //console.log(this._data.offers.push({title: titleData, price: priceData}))
+    this._data.offers.push({title: titleData, price: priceData});
+
+    if (!evt.target.checked){
+      this.updateData({
+
+      });
+    }
+    else {
+      this.updateData({
+        offers : this._data.offers.filter((offer) => titleData !== offer.title),
+      });
+    }
   }
 
   _destinationToggleHandler(evt) {

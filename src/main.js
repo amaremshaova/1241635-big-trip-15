@@ -46,6 +46,7 @@ const handleAddPointBtnClick = () => {
 
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
+  console.log(1111);
 
   tripPresenter.createPoint(handlePointNewFormClose);
   //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
@@ -62,7 +63,7 @@ const handleSiteMenuClick = (menuItem) => {
     case MenuItem.STATS:
       tripPresenter.destroy();
       statisticsComponent = new StatisticsView(pointsModel.getPoints());
-      menuModel.setItemMenu(UpdateType.MAJOR, MenuItem.STATS);
+      //menuModel.setItemMenu(UpdateType.MAJOR, MenuItem.STATS);
       render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
@@ -87,26 +88,29 @@ const createInfoModel = (infoData) => {
 
 filterPresenter.init();
 
+tripPresenter.init();
+
 api.getDestinations()
   .then((destinationsData) => {
     pointsModel.setDestinations(destinationsData);
-  })
-  .then(() => {
-    api.getOffers().then((offersData) => {
-      pointsModel.setOffers(offersData);
+  });
 
-    });
-  })
-  .then(() => {api.getPoints()
-    .then((points) => {
-      createInfoModel(createInfoData(points));
-      addPointButton.addEventListener('click', handleAddPointBtnClick);
-      filterPresenter.init();
-      pointsModel.setPoints(UpdateType.INIT, points);
+api.getOffers().
+  then((offersData) => {
+    console.log(offersData)
+    pointsModel.setOffers(offersData);
+  });
 
-      render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
-      siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-    });
+api.getPoints()
+  .then((points) => {
+    console.log(points);
+    createInfoModel(createInfoData(points));
+    addPointButton.addEventListener('click', handleAddPointBtnClick);
+    filterPresenter.init();
+    pointsModel.setPoints(UpdateType.INIT, points);
+
+    render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   })
   .catch(() => {
     //createInfoModel(createInfoData([]));
@@ -115,5 +119,3 @@ api.getDestinations()
     render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
-
-tripPresenter.init();

@@ -11,13 +11,11 @@ import {filter} from '../utils/filter.js';
 
 export default class Trip {
   constructor(tripContainer, pointsModel, filterModel, api) {
+
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
 
     this._tripContainer = tripContainer;
-
-    /*this._offersModel = offersModel;
-    this._destinationsModel = destinationsModel;*/
 
     this._pointPresenter = new Map();
     this._filterType = FilterType.EVERYTHING;
@@ -33,10 +31,7 @@ export default class Trip {
     this._noPointComponent = new NoPointView(this._filterType);
     this._loadingComponent = new LoadingView();
 
-    this._cities = [];
-    //this._destinations = [];
-    //this._offers = [];
-
+    this._getDestinations = this._getDestinations.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -46,11 +41,6 @@ export default class Trip {
   }
 
   init() {
-
-    this._destinations = this._getDestinations();
-    this._offers = this._getOffers();
-    this._getCities(this._destinations);
-
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
@@ -67,7 +57,7 @@ export default class Trip {
   }
 
   createPoint(callback) {
-    this._pointNewPresenter.init(callback, this._offers, this._destinations, this._cities);
+    this._pointNewPresenter.init(callback, this._destinations, this._offers, this._cities);
   }
 
   _getOffers() {
@@ -76,6 +66,7 @@ export default class Trip {
   }
 
   _getDestinations() {
+    console.log(this._pointsModel.getDestinations())
     return this._pointsModel.getDestinations();
   }
 
@@ -185,7 +176,8 @@ export default class Trip {
       this._handleViewAction, this._handleModeChange);
 
 
-    pointPresenter.init(point, destinations, offers, this._cities);
+    console.log(destinations, offers, this._cities);
+    pointPresenter.init(point, this._destinations, this._offers, this._cities);
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
@@ -231,6 +223,11 @@ export default class Trip {
       this._renderLoading();
       return;
     }
+
+    this._destinations = this._getDestinations();
+    this._offers = this._getOffers();
+    this._cities = this._getCities(this._destinations);
+
     const points = this._getPoints();
     const pointCount = points.length;
 
