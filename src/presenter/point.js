@@ -31,7 +31,7 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    ///this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._closeDownHandler = this._closeDownHandler.bind(this);
   }
 
@@ -147,18 +147,18 @@ export default class Point {
     }
   }
 
-  _closeDownHandler(evt) {
+  /*_closeDownHandler(evt) {
     evt.preventDefault();
     this._pointEditComponent.reset(this._point);
     this._replaceFormToCard();
-  }
+  }*/
 
-  _handleEditClick() {
+  /*_handleEditClick() {
     this._replaceCardToForm();
     if (!isOnline()) {
       toast('You can\'t edit point offline');
     }
-  }
+  }*/
 
   _handleFavoriteClick() {
     this._changeData(

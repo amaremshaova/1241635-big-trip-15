@@ -78,8 +78,6 @@ export default class Api {
     headers = new Headers(),
   }) {
 
-    console.log(body);
-
     headers.append('Authorization', this._authorization);
 
     return fetch(

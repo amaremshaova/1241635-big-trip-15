@@ -13,8 +13,8 @@ export default class PointNew {
     this._destroyCallback = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleCloseClick = this._handleCloseClick.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    //this._handleCloseClick = this._handleCloseClick.bind(this);
+    //this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(callback, newPointButton, destinations, offers, cities) {
@@ -84,16 +84,16 @@ export default class PointNew {
     );
   }
 
-  _handleCloseClick() {
+  /*_handleCloseClick() {
     this._newPointButton.disabled = false;
     this.destroy();
-  }
+  }*/
 
-  _escKeyDownHandler(evt) {
+  /*_escKeyDownHandler(evt) {
     this._newPointButton.disabled = false;
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
     }
-  }
+  }*/
 }

@@ -74,10 +74,11 @@ export default class PointTrip extends AbstractView{
     this._callback.favoriteClick();
   }
 
-  setEditClickHandler(callback) {
+  /*setEditClickHandler(callback) {
     this._callback.editClick = callback;
+
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
-  }
+  }*/
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;

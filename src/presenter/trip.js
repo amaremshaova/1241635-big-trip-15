@@ -176,7 +176,7 @@ export default class Trip {
     render(this._tripContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderPoint(point, destinations, offers){
+  _renderPoint(point){
     const pointPresenter = new PointPresenter(this._pointListComponent,
       this._handleViewAction, this._handleModeChange);
 

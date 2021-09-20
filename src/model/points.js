@@ -9,7 +9,6 @@ export default class Points extends AbstractObserver {
   }
 
   setOffers( offers) {
-    //console.log(offers)
     this._offers = offers.slice();
     //this._notify(updateType);
   }
@@ -26,7 +25,6 @@ export default class Points extends AbstractObserver {
   }
 
   getDestinations() {
-    console.log(this);
     return this._destinations;
   }
 
@@ -101,8 +99,6 @@ export default class Points extends AbstractObserver {
   }
 
   static adaptToServer(point) {
-
-    console.log(point.dateFrom.toISOString());
     const adaptedPoint = Object.assign(
       {},
       point,
