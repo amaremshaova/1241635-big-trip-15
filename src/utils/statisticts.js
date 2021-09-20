@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { OFFER_TYPE } from '../const.js';
-import { getDuration } from './point.js';
 
 export const countPointsInMoneyRange = (points) =>{
   const moneyTypesArray = new Array().fill();

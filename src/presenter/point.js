@@ -3,6 +3,8 @@ import PointView from '../view/point-trip';
 import PointEditView from '../view/point-edit.js';
 import {UserAction, UpdateType} from '../const.js';
 import { isPointFuture, isPointPast } from '../utils/point.js';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -85,6 +87,7 @@ export default class Point {
     }
   }
 
+
   setViewState(state) {
     if (this._mode === Mode.DEFAULT) {
       return;
@@ -121,6 +124,7 @@ export default class Point {
   _replaceCardToForm() {
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
+
     this._pointEditComponent.getElement().querySelector('.event__rollup-btn')
       .addEventListener('click', this._closeDownHandler);
     this._changeMode();
@@ -151,6 +155,9 @@ export default class Point {
 
   _handleEditClick() {
     this._replaceCardToForm();
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+    }
   }
 
   _handleFavoriteClick() {
@@ -169,13 +176,15 @@ export default class Point {
 
   _handleFormSubmit(update) {
 
-    console.log(11111111)
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      return;
+    }
 
     const isMinorUpdate =
       isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
       ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);
 
-      console.log(isMinorUpdate);
     this._replaceFormToCard();
     this._changeData( UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
@@ -184,6 +193,12 @@ export default class Point {
   }
 
   _handleDeleteClick(point) {
+
+    if (!isOnline()) {
+      toast('You can\'t delete point offline');
+      return;
+    }
+
     this._changeData(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,

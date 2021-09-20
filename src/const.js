@@ -38,7 +38,8 @@ export const BLANK_POINT = {
   basePrice : 0,
   dateFrom : dayjs(),
   dateTo : dayjs(),
-  type :'taxi',
   destination : [],
+  isFavorite : false,
   offers : [],
+  type :'taxi',
 };

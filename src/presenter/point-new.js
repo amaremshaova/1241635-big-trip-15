@@ -17,8 +17,9 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(callback, destinations, offers, cities) {
+  init(callback, newPointButton, destinations, offers, cities) {
     this._destroyCallback = callback;
+    this._newPointButton = newPointButton;
 
     if (this._pointEditComponent !== null) {
       return;
@@ -30,6 +31,9 @@ export default class PointNew {
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this._escKeyDownHandler);
+
+    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
+      addEventListener('click', this._handleCloseClick);
   }
 
   destroy() {
@@ -42,9 +46,13 @@ export default class PointNew {
     }
 
     remove(this._pointEditComponent);
+    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
+      removeEventListener('click', this._handleCloseClick);
     this._pointEditComponent = null;
 
+
     document.removeEventListener('keydown', this._escKeyDownHandler);
+
   }
 
   setSaving() {
@@ -67,6 +75,8 @@ export default class PointNew {
   }
 
   _handleFormSubmit(point) {
+    this._newPointButton.disabled = false;
+
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
@@ -75,10 +85,12 @@ export default class PointNew {
   }
 
   _handleCloseClick() {
+    this._newPointButton.disabled = false;
     this.destroy();
   }
 
   _escKeyDownHandler(evt) {
+    this._newPointButton.disabled = false;
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();

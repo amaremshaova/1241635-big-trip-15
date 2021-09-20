@@ -1,6 +1,6 @@
 
 import FilterView from '../view/filters.js';
-
+import {filter} from '../utils/filter.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {FilterType, UpdateType} from '../const.js';
 
@@ -48,23 +48,29 @@ export default class Filter {
   }
 
   _getFilters() {
+    const points = this._pointsModel.getPoints();
+
 
     return [
       {
         type: FilterType.EVERYTHING,
         name: 'everything',
+        count: filter[FilterType.EVERYTHING](points).length,
       },
       {
         type: FilterType.FUTURE,
         name: 'future',
+        count: filter[FilterType.FUTURE](points).length,
       },
       {
         type: FilterType.PAST,
         name: 'past',
+        count: filter[FilterType.PAST](points).length,
       },
       {
         type: FilterType.FAVORITES,
         name: 'favorites',
+        count: filter[FilterType.FAVORITES](points).length,
       },
     ];
   }

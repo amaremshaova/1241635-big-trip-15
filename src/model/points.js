@@ -101,12 +101,14 @@ export default class Points extends AbstractObserver {
   }
 
   static adaptToServer(point) {
+
+    console.log(point.dateFrom.toISOString());
     const adaptedPoint = Object.assign(
       {},
       point,
       {
-        'date_from': point.dateFrom instanceof Date ? point.dateFrom.toISOString() : null,
-        'date_to': point.dateTo instanceof Date ? point.dateTo.toISOString() : null,
+        'date_from': point.dateFrom.toISOString(),
+        'date_to': point.dateTo.toISOString(),
         'is_favorite': point.isFavorite,
         'base_price': point.basePrice,
       },

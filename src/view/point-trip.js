@@ -47,7 +47,8 @@ const createPointTripTemplate = (point) => {
     <span class="visually-hidden">Open event</span>
   </button>
 </div>
-</li>`};
+</li>`;
+};
 
 export default class PointTrip extends AbstractView{
 

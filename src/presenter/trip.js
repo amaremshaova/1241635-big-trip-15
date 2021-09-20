@@ -4,7 +4,7 @@ import NoPointView from '../view/no-point.js';
 import PointListView from '../view/point-list.js';
 import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import PointNewPresenter from './point-new.js';
-import {render, RenderPosition, remove} from '../utils/render.js';
+import {render, RenderPosition, remove, replace} from '../utils/render.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 import LoadingView from '../view/loading.js';
 import {filter} from '../utils/filter.js';
@@ -20,7 +20,7 @@ export default class Trip {
     this._pointPresenter = new Map();
     this._filterType = FilterType.EVERYTHING;
 
-    this._currentSortType = SortType.DEFAULT;
+    this._currentSortType = SortType.DAY;
     this._isLoading = true;
     this._api = api;
 
@@ -56,8 +56,12 @@ export default class Trip {
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
-  createPoint(callback) {
-    this._pointNewPresenter.init(callback, this._destinations, this._offers, this._cities);
+  createPoint(callback, newPointButton) {
+    const noPointElement = this._tripContainer.querySelector('.trip-events__msg');
+    if (noPointElement !== null) {
+      replace(this._pointListComponent, this._noPointComponent);
+    }
+    this._pointNewPresenter.init(callback, newPointButton, this._destinations, this._offers, this._cities);
   }
 
   _getOffers() {
@@ -66,7 +70,6 @@ export default class Trip {
   }
 
   _getDestinations() {
-    console.log(this._pointsModel.getDestinations())
     return this._pointsModel.getDestinations();
   }
 
@@ -75,6 +78,7 @@ export default class Trip {
     const points = this._pointsModel.getPoints();
 
     const filtredPoints = filter[this._filterType](points);
+
 
     switch (this._currentSortType) {
       case SortType.TIME:
@@ -107,6 +111,7 @@ export default class Trip {
         break;
       case UserAction.ADD_POINT:
         this._pointNewPresenter.setSaving();
+
         this._api.addPoint(update)
           .then((response) => {
             this._pointsModel.addPoint(updateType, response);
@@ -175,14 +180,12 @@ export default class Trip {
     const pointPresenter = new PointPresenter(this._pointListComponent,
       this._handleViewAction, this._handleModeChange);
 
-
-    console.log(destinations, offers, this._cities);
     pointPresenter.init(point, this._destinations, this._offers, this._cities);
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
   _getCities(destinations){
-    this._cities = destinations.map((item) => item.name);
+    return destinations.map((item) => item.name);
   }
 
   _renderPoints(points) {
@@ -232,6 +235,7 @@ export default class Trip {
     const pointCount = points.length;
 
     if (pointCount === 0) {
+      remove(this._sortComponent);
       this._renderNoPoints();
       return;
     }

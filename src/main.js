@@ -5,18 +5,24 @@ import StatisticsView from './view/statisticts.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
-import MenuModel from './model/menu.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import {MenuItem} from './const.js';
-import Api from './api.js';
+import Api from './api/api.js';
 import { remove } from './utils/render.js';
 import { getCostTrip } from './utils/get-cost.js';
 import { UpdateType, FilterType } from './const.js';
+import {isOnline} from './utils/common.js';
+import {toast} from './utils/toast.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 
+const STORE_PREFIX = 'bigTrip-localstorage';
+const STORE_VER = 'v15';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
-const AUTHORIZATION = 'Basic kTy9gIdsz2317rD';
-const END_POINT = 'https://15.ecmascript.pages.academy/big-trip/';
+const AUTHORIZATION = 'Basic hS2sd3dfSwcl1sa2j';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const headerMainElement = document.querySelector('.trip-main');
 const headerNavigationElement = headerMainElement.querySelector('.trip-controls__navigation');
@@ -26,30 +32,35 @@ const addPointButton = document.querySelector('.trip-main__event-add-btn');
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
+
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
-//const menuModel = new MenuModel();
 const siteMenuComponent = new SiteMenuView(MenuItem.TABLE);
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel, api);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(headerFiltersElement, filterModel, pointsModel);
 
 const handlePointNewFormClose = () => {
-  //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.TABLE}]`).disabled = false;
-  //siteMenuComponent.setMenuItem(MenuItem.TABLE);
+
 };
 
 let statisticsComponent = null;
 
-const handleAddPointBtnClick = () => {
+const handleAddPointBtnClick = (evt) => {
+  evt.target.disabled = true;
   remove(statisticsComponent);
   tripPresenter.destroy();
 
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
-  console.log(1111);
 
-  tripPresenter.createPoint(handlePointNewFormClose);
-  //siteMenuComponent.getElement().querySelector(`[name=${MenuItem.POINTS}]`).disabled = true;
+  tripPresenter.createPoint(handlePointNewFormClose, evt.target);
+  if (!isOnline()) {
+    toast('You can\'t create new point offline');
+    siteMenuComponent.setMenuItem(MenuItem.TABLE);
+  }
+
 };
 
 const handleSiteMenuClick = (menuItem) => {
@@ -58,12 +69,11 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.destroy();
       tripPresenter.init();
       remove(statisticsComponent);
-      filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
+      //filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
       statisticsComponent = new StatisticsView(pointsModel.getPoints());
-      //menuModel.setItemMenu(UpdateType.MAJOR, MenuItem.STATS);
       render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
@@ -87,23 +97,20 @@ const createInfoModel = (infoData) => {
 };
 
 filterPresenter.init();
-
 tripPresenter.init();
 
-api.getDestinations()
+apiWithProvider.getDestinations()
   .then((destinationsData) => {
     pointsModel.setDestinations(destinationsData);
   });
 
-api.getOffers().
+apiWithProvider.getOffers().
   then((offersData) => {
-    console.log(offersData)
     pointsModel.setOffers(offersData);
   });
 
-api.getPoints()
+apiWithProvider.getPoints()
   .then((points) => {
-    console.log(points);
     createInfoModel(createInfoData(points));
     addPointButton.addEventListener('click', handleAddPointBtnClick);
     filterPresenter.init();
@@ -113,9 +120,23 @@ api.getPoints()
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   })
   .catch(() => {
-    //createInfoModel(createInfoData([]));
+    addPointButton.addEventListener('click', handleAddPointBtnClick);
     filterPresenter.init();
     pointsModel.setPoints(UpdateType.INIT, []);
+
     render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
+});
