@@ -46,6 +46,8 @@ export const replace = (newChild, oldChild) => {
   }
 
   parent.replaceChild(newChild, oldChild);
+
+  console.log(parent);
 };
 
 export const remove = (component) => {

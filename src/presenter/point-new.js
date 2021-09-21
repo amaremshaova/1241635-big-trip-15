@@ -13,8 +13,8 @@ export default class PointNew {
     this._destroyCallback = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    //this._handleCloseClick = this._handleCloseClick.bind(this);
-    //this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(callback, newPointButton, destinations, offers, cities) {
@@ -25,15 +25,13 @@ export default class PointNew {
       return;
     }
 
-    this._pointEditComponent = new PointEditView(BLANK_POINT,  destinations, offers, cities);
+    this._pointEditComponent = new PointEditView(BLANK_POINT,  destinations, offers, cities, this._handleCloseClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleCloseClick);
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this._escKeyDownHandler);
-
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
-      addEventListener('click', this._handleCloseClick);
   }
 
   destroy() {
@@ -46,11 +44,7 @@ export default class PointNew {
     }
 
     remove(this._pointEditComponent);
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
-      removeEventListener('click', this._handleCloseClick);
     this._pointEditComponent = null;
-
-
     document.removeEventListener('keydown', this._escKeyDownHandler);
 
   }
@@ -84,16 +78,17 @@ export default class PointNew {
     );
   }
 
-  /*_handleCloseClick() {
+  _handleCloseClick() {
+    //evt.preventDefault();
     this._newPointButton.disabled = false;
     this.destroy();
-  }*/
+  }
 
-  /*_escKeyDownHandler(evt) {
+  _escKeyDownHandler(evt) {
     this._newPointButton.disabled = false;
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
     }
-  }*/
+  }
 }

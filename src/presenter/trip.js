@@ -21,7 +21,7 @@ export default class Trip {
     this._filterType = FilterType.EVERYTHING;
 
     this._currentSortType = SortType.DAY;
-    this._isLoading = true;
+    this._isLoading = false;
     this._api = api;
 
     this._sortComponent = null;
@@ -177,10 +177,11 @@ export default class Trip {
   }
 
   _renderPoint(point){
+
     const pointPresenter = new PointPresenter(this._pointListComponent,
       this._handleViewAction, this._handleModeChange);
-
     pointPresenter.init(point, this._destinations, this._offers, this._cities);
+
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
@@ -189,8 +190,7 @@ export default class Trip {
   }
 
   _renderPoints(points) {
-
-    points.forEach((point) => this._renderPoint(point, this._destinations, this._offers));
+    points.forEach((point) => this._renderPoint(point));
   }
 
   _renderLoading() {
@@ -238,6 +238,10 @@ export default class Trip {
       remove(this._sortComponent);
       this._renderNoPoints();
       return;
+    }
+
+    if (this._noPointComponent) {
+      remove(this._noPointComponent);
     }
 
     this._renderSort();

@@ -52,7 +52,7 @@ const handleAddPointBtnClick = (evt) => {
   remove(statisticsComponent);
   tripPresenter.destroy();
 
-  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+ // filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
 
   tripPresenter.createPoint(handlePointNewFormClose, evt.target);
@@ -69,7 +69,7 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.destroy();
       tripPresenter.init();
       remove(statisticsComponent);
-      //filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
+      filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
@@ -112,14 +112,18 @@ apiWithProvider.getOffers().
 apiWithProvider.getPoints()
   .then((points) => {
     createInfoModel(createInfoData(points));
+
     addPointButton.addEventListener('click', handleAddPointBtnClick);
+
     filterPresenter.init();
+
     pointsModel.setPoints(UpdateType.INIT, points);
 
     render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   })
   .catch(() => {
+
     addPointButton.addEventListener('click', handleAddPointBtnClick);
     filterPresenter.init();
     pointsModel.setPoints(UpdateType.INIT, []);

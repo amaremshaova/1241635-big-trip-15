@@ -19,8 +19,6 @@ export default class Points extends AbstractObserver {
 
   setDestinations(destinations) {
     this._destinations = destinations.slice();
-
-
     //this._notify(updateType);
   }
 
@@ -29,7 +27,7 @@ export default class Points extends AbstractObserver {
   }
 
   setPoints(updateType, points) {
-    this._points = points.slice();
+    this._points = points;
     this._notify(updateType);
   }
 

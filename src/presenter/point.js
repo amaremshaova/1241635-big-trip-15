@@ -31,8 +31,9 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
-    ///this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._closeDownHandler = this._closeDownHandler.bind(this);
+
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+
   }
 
   init(point, destinations, offers, cities) {
@@ -40,35 +41,46 @@ export default class Point {
     this._offers = offers;
     this._destinations = destinations;
     this._cities = this.uniqueCities(cities);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities);
+    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities, this._handleCloseClick);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
+    render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
 
-    if (prevPointComponent === null || prevPointEditComponent === null) {
-      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
-      return;
-    }
-
+   /* console.log('ПРОШЛО');
     if (this._mode === Mode.DEFAULT) {
+      //render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
       replace(this._pointComponent, prevPointComponent);
+      console.log('ПРОШЛО');
+
     }
+
+    console.log('ПРОШЛО');
 
     if (this._mode === Mode.EDITING) {
       replace(this._pointComponent, prevPointEditComponent);
       this._mode = Mode.DEFAULT;
     }
 
+    console.log('ПРОШЛО');
+
+    if (prevPointComponent !== null)
     remove(prevPointComponent);
+
+    if (prevPointEditComponent !== null)
     remove(prevPointEditComponent);
+*/
+
   }
 
   uniqueCities(cities){
@@ -121,12 +133,16 @@ export default class Point {
     }
   }
 
+  _handleCloseClick() {
+    //this._pointEditComponent.reset(this._point);
+    this._replaceFormToCard();
+  }
+
   _replaceCardToForm() {
     replace(this._pointEditComponent, this._pointComponent);
+
     document.addEventListener('keydown', this._escKeyDownHandler);
 
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn')
-      .addEventListener('click', this._closeDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
@@ -134,31 +150,21 @@ export default class Point {
   _replaceFormToCard() {
     replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn')
-      .removeEventListener('click', this._closeDownHandler);
     this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._pointEditComponent.reset(this._point);
-      this._replaceFormToCard();
+      this._handleCloseClick(evt);
     }
   }
 
-  /*_closeDownHandler(evt) {
-    evt.preventDefault();
-    this._pointEditComponent.reset(this._point);
-    this._replaceFormToCard();
-  }*/
-
-  /*_handleEditClick() {
+  _handleEditClick() {
     this._replaceCardToForm();
     if (!isOnline()) {
       toast('You can\'t edit point offline');
     }
-  }*/
+  }
 
   _handleFavoriteClick() {
     this._changeData(
