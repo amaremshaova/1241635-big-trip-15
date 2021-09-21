@@ -1,0 +1,99 @@
+import PointEditView from '../view/point-edit.js';
+import {remove, render, RenderPosition} from '../utils/render.js';
+import {UserAction, UpdateType} from '../const.js';
+import { BLANK_POINT } from '../const.js';
+
+
+export default class PointNew {
+  constructor(pointListContainer, changeData) {
+    this._pointListContainer = pointListContainer;
+    this._changeData = changeData;
+
+    this._pointEditComponent = null;
+    this._destroyCallback = null;
+
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    //this._handleCloseClick = this._handleCloseClick.bind(this);
+    //this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+  }
+
+  init(callback, newPointButton, destinations, offers, cities) {
+    this._destroyCallback = callback;
+    this._newPointButton = newPointButton;
+
+    if (this._pointEditComponent !== null) {
+      return;
+    }
+
+    this._pointEditComponent = new PointEditView(BLANK_POINT,  destinations, offers, cities);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setDeleteClickHandler(this._handleCloseClick);
+
+    render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
+    document.addEventListener('keydown', this._escKeyDownHandler);
+
+    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
+      addEventListener('click', this._handleCloseClick);
+  }
+
+  destroy() {
+    if (this._pointEditComponent === null) {
+      return;
+    }
+
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
+    }
+
+    remove(this._pointEditComponent);
+    this._pointEditComponent.getElement().querySelector('.event__rollup-btn').
+      removeEventListener('click', this._handleCloseClick);
+    this._pointEditComponent = null;
+
+
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+
+  }
+
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+  }
+
+  _handleFormSubmit(point) {
+    this._newPointButton.disabled = false;
+
+    this._changeData(
+      UserAction.ADD_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  }
+
+  /*_handleCloseClick() {
+    this._newPointButton.disabled = false;
+    this.destroy();
+  }*/
+
+  /*_escKeyDownHandler(evt) {
+    this._newPointButton.disabled = false;
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.destroy();
+    }
+  }*/
+}
