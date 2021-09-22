@@ -34,8 +34,6 @@ export const sortPointDay = (pointA, pointB) => {
   if (weight !== null) {
     return weight;
   }
-
-  //return dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
   return getWeightForSort(dayjs(pointA.dateFrom), dayjs(pointB.dateFrom));
 };
 
@@ -48,7 +46,6 @@ export const sortPointTime = (pointA, pointB) => {
   if (weight !== null) {
     return weight;
   }
-
   return getWeightForSort(durationPointA, durationPointB);
 
 };
@@ -61,8 +58,6 @@ export const sortPointPrice = (pointA, pointB) => {
   }
 
   return getWeightForSort(pointA.basePrice,  pointB.basePrice);
-
-  //return pointA.basePrice - pointB.basePrice;
 };
 
 export const isPointFuture = (dateFrom, dateTo) =>
@@ -87,7 +82,6 @@ export const getDestinationsArray = (destinations, nameCity) => {
 
 
 export const getDuration = (duration) =>{
-  //const duration = dayjs(dateTo).diff(dayjs(dateFrom));
 
   const durationDays = Math.floor(duration / (1000 * 60 * 60 * 24));
   const durationHours = Math.floor((duration / (1000 * 60 * 60)) % 24);
@@ -107,3 +101,5 @@ export const getDuration = (duration) =>{
     return `${days}D ${hours}H ${minutes}M`;
   }
 };
+
+

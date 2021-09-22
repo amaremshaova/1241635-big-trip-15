@@ -21,7 +21,7 @@ const createPointTripTemplate = (point) => {
       <time class="event__start-time" datetime="${dayjs(dateFrom).format('YYYY-MM-DDTHH:mm')}">
       ${dayjs(dateFrom).format('HH:mm')}</time>
       &mdash;
-      <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYY-MM-DDTHH:mm')}">
+      <time class="event__end-time" datetime="${dayjs(dateTo).format('YYYT-MM-DDTHH:mm')}">
       ${dayjs(dateTo).format('HH:mm')}</time>
     </p>
     <p class="event__duration">${getDuration(duration)}</p>
@@ -74,11 +74,10 @@ export default class PointTrip extends AbstractView{
     this._callback.favoriteClick();
   }
 
-  /*setEditClickHandler(callback) {
+  setEditClickHandler(callback) {
     this._callback.editClick = callback;
-
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
-  }*/
+  }
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;

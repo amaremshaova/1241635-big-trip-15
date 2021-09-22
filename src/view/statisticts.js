@@ -243,10 +243,7 @@ export default class Statistics extends SmartView {
     this._moneyChart = null;
     this._typesChart = null;
 
-   // this._dateChangeHandler = this._dateChangeHandler.bind(this);
-
     this._setCharts();
-    //this._setDatepicker();
   }
 
   removeElement() {
@@ -256,16 +253,10 @@ export default class Statistics extends SmartView {
       this._moneyChart = null;
       this._typesChart = null;
     }
-
-    /*if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }*/
   }
 
   restoreHandlers() {
     this._setCharts();
-    //this._setDatepicker();
   }
 
   getTemplate() {
@@ -278,7 +269,7 @@ export default class Statistics extends SmartView {
       this._typesChart = null;
     }
 
-    const {points, dateFrom, dateTo} = this._data;
+    const {points} = this._data;
 
     const moneyCtx = this.getElement().querySelector('.statistic__money');
     const typesCtx = this.getElement().querySelector('.statistic__type');

@@ -1,8 +1,7 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import PointView from '../view/point-trip';
+import PointView from '../view/point';
 import PointEditView from '../view/point-edit.js';
 import {UserAction, UpdateType} from '../const.js';
-import { isPointFuture, isPointPast } from '../utils/point.js';
 import {isOnline} from '../utils/common.js';
 import {toast} from '../utils/toast.js';
 
@@ -31,8 +30,9 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
-    ///this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._closeDownHandler = this._closeDownHandler.bind(this);
+
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+
   }
 
   init(point, destinations, offers, cities) {
@@ -40,18 +40,19 @@ export default class Point {
     this._offers = offers;
     this._destinations = destinations;
     this._cities = this.uniqueCities(cities);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities);
+    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities, this._handleCloseClick);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
-
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -69,6 +70,8 @@ export default class Point {
 
     remove(prevPointComponent);
     remove(prevPointEditComponent);
+
+
   }
 
   uniqueCities(cities){
@@ -121,44 +124,38 @@ export default class Point {
     }
   }
 
-  _replaceCardToForm() {
-    replace(this._pointEditComponent, this._pointComponent);
-    document.addEventListener('keydown', this._escKeyDownHandler);
+  _handleCloseClick() {
+    this._replaceFormToCard();
+  }
 
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn')
-      .addEventListener('click', this._closeDownHandler);
+  _replaceCardToForm() {
+
+    replace(this._pointEditComponent, this._pointComponent);
+
+    document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _replaceFormToCard() {
+
     replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._pointEditComponent.getElement().querySelector('.event__rollup-btn')
-      .removeEventListener('click', this._closeDownHandler);
     this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._pointEditComponent.reset(this._point);
-      this._replaceFormToCard();
+      this._handleCloseClick(evt);
     }
   }
 
-  /*_closeDownHandler(evt) {
-    evt.preventDefault();
-    this._pointEditComponent.reset(this._point);
-    this._replaceFormToCard();
-  }*/
-
-  /*_handleEditClick() {
+  _handleEditClick() {
     this._replaceCardToForm();
     if (!isOnline()) {
       toast('You can\'t edit point offline');
     }
-  }*/
+  }
 
   _handleFavoriteClick() {
     this._changeData(
@@ -181,10 +178,7 @@ export default class Point {
       return;
     }
 
-    const isMinorUpdate =
-      isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
-      ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);
-
+    const isMinorUpdate = true;
     this._replaceFormToCard();
     this._changeData( UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,

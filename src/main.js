@@ -1,17 +1,14 @@
 import SiteMenuView from './view/menu.js';
-import CostTripView from './view/cost-trip.js';
-import InfoTripView from './view/info-trip.js';
 import StatisticsView from './view/statisticts.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
-import PointsModel from './model/points.js';
+import PointsModel from './model/point.js';
 import FilterModel from './model/filter.js';
-import {MenuItem} from './const.js';
+import {FilterType, MenuItem} from './const.js';
 import Api from './api/api.js';
 import { remove } from './utils/render.js';
-import { getCostTrip } from './utils/get-cost.js';
-import { UpdateType, FilterType } from './const.js';
+import { UpdateType} from './const.js';
 import {isOnline} from './utils/common.js';
 import {toast} from './utils/toast.js';
 import Store from './api/store.js';
@@ -48,11 +45,10 @@ const handlePointNewFormClose = () => {
 let statisticsComponent = null;
 
 const handleAddPointBtnClick = (evt) => {
+  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   evt.target.disabled = true;
   remove(statisticsComponent);
   tripPresenter.destroy();
-
-  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
 
   tripPresenter.createPoint(handlePointNewFormClose, evt.target);
@@ -69,7 +65,7 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.destroy();
       tripPresenter.init();
       remove(statisticsComponent);
-      //filterModel.setItemMenu(UpdateType.MAJOR, MenuItem.TABLE);
+      filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
@@ -77,23 +73,6 @@ const handleSiteMenuClick = (menuItem) => {
       render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       break;
   }
-};
-
-const createInfoData = (points) => ({
-  isManyCities: points.length > 3 ? 'true' : 'false',
-  cities: points.length !== 0 ? points.map((point) => point.destination.name).slice(3) : '',
-  startDate: points.length !== 0 ? points[0].dateFrom : '',
-  endDate: points.length !== 0 ? points[points.length - 1].dateTo : '',
-  cost: points.length !== 0 ? getCostTrip(points) : '',
-});
-
-const createInfoModel = (infoData) => {
-  const infoSectionElement = document.createElement('section');
-  infoSectionElement.classList.add('trip-main__trip-info',  'trip-info');
-
-  render(infoSectionElement, new InfoTripView(infoData).getElement(), RenderPosition.BEFOREEND);
-  render(infoSectionElement, new CostTripView(infoData.cost).getElement(), RenderPosition.BEFOREEND);
-  render(headerMainElement, infoSectionElement, RenderPosition.AFTERBEGIN);
 };
 
 filterPresenter.init();
@@ -111,9 +90,8 @@ apiWithProvider.getOffers().
 
 apiWithProvider.getPoints()
   .then((points) => {
-    createInfoModel(createInfoData(points));
+
     addPointButton.addEventListener('click', handleAddPointBtnClick);
-    filterPresenter.init();
     pointsModel.setPoints(UpdateType.INIT, points);
 
     render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
@@ -121,7 +99,6 @@ apiWithProvider.getPoints()
   })
   .catch(() => {
     addPointButton.addEventListener('click', handleAddPointBtnClick);
-    filterPresenter.init();
     pointsModel.setPoints(UpdateType.INIT, []);
 
     render(headerNavigationElement, siteMenuComponent, RenderPosition.BEFOREEND);
