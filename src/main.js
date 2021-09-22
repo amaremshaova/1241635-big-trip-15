@@ -38,10 +38,6 @@ const siteMenuComponent = new SiteMenuView(MenuItem.TABLE);
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, filterModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(headerFiltersElement, filterModel, pointsModel);
 
-const handlePointNewFormClose = () => {
-
-};
-
 let statisticsComponent = null;
 
 const handleAddPointBtnClick = (evt) => {
@@ -51,7 +47,7 @@ const handleAddPointBtnClick = (evt) => {
   tripPresenter.destroy();
   tripPresenter.init();
 
-  tripPresenter.createPoint(handlePointNewFormClose, evt.target);
+  tripPresenter.createPoint( evt.target);
   if (!isOnline()) {
     toast('You can\'t create new point offline');
     siteMenuComponent.setMenuItem(MenuItem.TABLE);

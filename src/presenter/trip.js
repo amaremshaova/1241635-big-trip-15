@@ -60,12 +60,12 @@ export default class Trip {
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
-  createPoint(callback, newPointButton) {
+  createPoint(newPointButton) {
     const noPointElement = this._tripContainer.querySelector('.trip-events__msg');
     if (noPointElement !== null) {
       replace(this._pointListComponent, this._noPointComponent);
     }
-    this._pointNewPresenter.init(callback, newPointButton, this._destinations, this._offers, this._cities);
+    this._pointNewPresenter.init(newPointButton, this._destinations, this._offers, this._cities);
   }
 
   _parseInfoData(points) {
