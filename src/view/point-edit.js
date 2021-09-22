@@ -9,7 +9,7 @@ import { getOffersArray, getDestinationsArray } from '../utils/point.js';
 
 const createPointEditOffersTemplate = (offers, isNewPoint, isOffers, offersMain, isDisabled) =>{
   const titles = offers.map((offer) => offer.title);
-  return `<section class="event__section  event__section--offers">
+  return ((isOffers || isNewPoint) && offersMain.length !== 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
     ${offersMain.map((offer, index) => `
@@ -24,7 +24,7 @@ const createPointEditOffersTemplate = (offers, isNewPoint, isOffers, offersMain,
           <span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`).join('')}
-    </div></section>`;
+    </div></section>` : '';
 };
 
 
@@ -197,13 +197,10 @@ export default class PointEdit extends SmartView {
 
     this._currentCity = point.destination.name;
     this._data = PointEdit.parsePointToData(point);
+    this._prevData = PointEdit.parsePointToData(point);
     this._dateFromPicker = null;
     this._dateToPicker = null;
     this._callbackClose = callbackClose;
-
-    if (point.isNewPoint){
-      this._data.isNewPoint = false;
-    }
 
     this._offers = offersAll;
     this._destinations = destinationsAll;
@@ -255,12 +252,6 @@ export default class PointEdit extends SmartView {
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
-  _dateToChangeHandler([userDate]) {
-    this.updateData({
-      dateTo: userDate,
-    });
-  }
-
   _setDatepicker() {
     if (this._dateFromPicker) {
       this._dateFromPicker.destroy();
@@ -301,6 +292,14 @@ export default class PointEdit extends SmartView {
     this.updateData({
       dateFrom: userDate,
     });
+    this.setCloseClickHandler(this._callbackClose);
+  }
+
+  _dateToChangeHandler([userDate]) {
+    this.updateData({
+      dateTo: userDate,
+    });
+    this.setCloseClickHandler(this._callbackClose);
   }
 
   _setInnerHandlers() {
@@ -401,6 +400,7 @@ export default class PointEdit extends SmartView {
     this.updateData({
       basePrice: Number(evt.target.value),
     });
+    this.setCloseClickHandler(this._callbackClose);
   }
 
   _formSubmitHandler(evt) {
@@ -463,6 +463,10 @@ export default class PointEdit extends SmartView {
 
   _formCloseClickHandler(evt){
     evt.preventDefault();
+    this.updateData(
+      this._prevData,
+    );
+
     this._callback.closeClick(evt);
   }
 

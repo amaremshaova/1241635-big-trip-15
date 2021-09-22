@@ -126,6 +126,7 @@ export default class Point {
 
   _handleCloseClick() {
     this._replaceFormToCard();
+
   }
 
   _replaceCardToForm() {

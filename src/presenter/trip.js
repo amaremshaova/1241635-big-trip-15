@@ -161,8 +161,6 @@ export default class Trip {
       case UpdateType.MINOR:
         this._clearTrip();
         this._renderTrip();
-        this._infoTripComponent.clearInfoTrip();
-        this._infoTripComponent.renderInfoTrip();
         break;
       case UpdateType.MAJOR:
         this._clearTrip(true);
