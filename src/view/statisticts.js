@@ -243,8 +243,6 @@ export default class Statistics extends SmartView {
     this._moneyChart = null;
     this._typesChart = null;
 
-    // this._dateChangeHandler = this._dateChangeHandler.bind(this);
-
     this._setCharts();
   }
 

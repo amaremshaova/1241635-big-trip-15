@@ -53,9 +53,4 @@ export default class Menu extends AbstractView {
     this.getElement().querySelectorAll('.trip-tabs__btn').forEach((item) =>
       item.addEventListener('click', this._menuClickHandler));
   }
-
-  setMenuItem() {
-    //const item = this.getElement().querySelector(`[name=${menuItem}]`);
-
-  }
 }

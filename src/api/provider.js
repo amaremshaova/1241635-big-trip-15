@@ -34,7 +34,6 @@ export default class Provider {
   }
 
   getPoints() {
-    //return this._api.getPoints();
     if (isOnline()) {
       return this._api.getPoints()
         .then((points) => {
@@ -90,12 +89,8 @@ export default class Provider {
 
       return this._api.sync(storePoints)
         .then((response) => {
-          // Забираем из ответа синхронизированные задачи
           const createdPoints = getSyncedPoints(response.created);
           const updatedPoints = getSyncedPoints(response.updated);
-
-          // Добавляем синхронизированные задачи в хранилище.
-          // Хранилище должно быть актуальным в любой момент.
           const items = createStoreStructure([...createdPoints, ...updatedPoints]);
 
           this._store.setItems(items);

@@ -85,7 +85,6 @@ export default class Points extends AbstractObserver {
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedPoint['date_from'];
     delete adaptedPoint['date_to'];
     delete adaptedPoint['is_favorite'];
@@ -107,7 +106,6 @@ export default class Points extends AbstractObserver {
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedPoint.dateFrom;
     delete adaptedPoint.dateTo;
     delete adaptedPoint.isFavorite;

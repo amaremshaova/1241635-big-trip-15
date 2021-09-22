@@ -2,7 +2,6 @@ import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import PointView from '../view/point';
 import PointEditView from '../view/point-edit.js';
 import {UserAction, UpdateType} from '../const.js';
-import { isPointFuture, isPointPast } from '../utils/point.js';
 import {isOnline} from '../utils/common.js';
 import {toast} from '../utils/toast.js';
 
@@ -54,8 +53,6 @@ export default class Point {
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
-
-    //render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -128,7 +125,6 @@ export default class Point {
   }
 
   _handleCloseClick() {
-    //this._pointEditComponent.reset(this._point);
     this._replaceFormToCard();
   }
 
@@ -183,9 +179,6 @@ export default class Point {
     }
 
     const isMinorUpdate = true;
-      /*isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
-      ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);*/
-
     this._replaceFormToCard();
     this._changeData( UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,

@@ -79,7 +79,6 @@ export default class PointNew {
   }
 
   _handleCloseClick() {
-    //evt.preventDefault();
     this._newPointButton.disabled = false;
     this.destroy();
   }
