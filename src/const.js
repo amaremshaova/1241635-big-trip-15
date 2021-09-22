@@ -17,6 +17,7 @@ export const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  INFO: 'INFO',
 };
 
 export const FilterType = {
@@ -42,4 +43,5 @@ export const BLANK_POINT = {
   isFavorite : false,
   offers : [],
   type :'taxi',
+  isNewPoint: true,
 };

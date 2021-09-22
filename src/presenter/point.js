@@ -1,5 +1,5 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import PointView from '../view/point-trip';
+import PointView from '../view/point';
 import PointEditView from '../view/point-edit.js';
 import {UserAction, UpdateType} from '../const.js';
 import { isPointFuture, isPointPast } from '../utils/point.js';
@@ -55,31 +55,25 @@ export default class Point {
     this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
-    render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+    //render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
 
-   /* console.log('ПРОШЛО');
-    if (this._mode === Mode.DEFAULT) {
-      //render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
-      replace(this._pointComponent, prevPointComponent);
-      console.log('ПРОШЛО');
-
+    if (prevPointComponent === null || prevPointEditComponent === null) {
+      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      return;
     }
 
-    console.log('ПРОШЛО');
+    if (this._mode === Mode.DEFAULT) {
+      replace(this._pointComponent, prevPointComponent);
+    }
 
     if (this._mode === Mode.EDITING) {
       replace(this._pointComponent, prevPointEditComponent);
       this._mode = Mode.DEFAULT;
     }
 
-    console.log('ПРОШЛО');
-
-    if (prevPointComponent !== null)
     remove(prevPointComponent);
-
-    if (prevPointEditComponent !== null)
     remove(prevPointEditComponent);
-*/
+
 
   }
 
@@ -139,15 +133,16 @@ export default class Point {
   }
 
   _replaceCardToForm() {
+
     replace(this._pointEditComponent, this._pointComponent);
 
     document.addEventListener('keydown', this._escKeyDownHandler);
-
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _replaceFormToCard() {
+
     replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
@@ -187,9 +182,9 @@ export default class Point {
       return;
     }
 
-    const isMinorUpdate =
-      isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
-      ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);
+    const isMinorUpdate = true;
+      /*isPointFuture(this._point.dateFrom, this._point.dateTo) !== isPointFuture(update.dateFrom, update.dateTo)
+      ||  isPointPast(this._point.dateFrom, this._point.dateTo) !== isPointPast(update.dateFrom, update.dateTo);*/
 
     this._replaceFormToCard();
     this._changeData( UserAction.UPDATE_POINT,
