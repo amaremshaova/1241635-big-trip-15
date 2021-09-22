@@ -17,8 +17,7 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(callback, newPointButton, destinations, offers, cities) {
-    this._destroyCallback = callback;
+  init(newPointButton, destinations, offers, cities) {
     this._newPointButton = newPointButton;
 
     if (this._pointEditComponent !== null) {
@@ -57,15 +56,19 @@ export default class PointNew {
   }
 
   setAborting() {
-    const resetFormState = () => {
-      this._pointEditComponent.updateData({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
+    if(this._pointEditComponent)
+    {
+      const resetFormState = () => {
+        this._pointEditComponent.updateData({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false,
+        });
+      };
 
-    this._pointEditComponent.shake(resetFormState);
+
+      this._pointEditComponent.shake(resetFormState);
+    }
   }
 
   _handleFormSubmit(point) {
