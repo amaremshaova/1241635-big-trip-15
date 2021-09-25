@@ -1,4 +1,4 @@
-import PointsModel from '../model/point.js';
+import PointsModel from '../model/points';
 import {isOnline} from '../utils/common.js';
 
 const getSyncedPoints = (items) =>

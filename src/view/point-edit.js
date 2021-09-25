@@ -176,7 +176,7 @@ const createEditingFormTemplate = (point, cities, offersMain) => {
     <button class="event__reset-btn"
     type="reset"
     ${isDisabled ? 'disabled' : ''}>
-        ${isDestination ?  deleteString: 'Cancel'}
+        ${isNewPoint? 'Cancel' : deleteString}
     </button>
 
     <button class="event__rollup-btn" type="button">
@@ -192,7 +192,7 @@ const createEditingFormTemplate = (point, cities, offersMain) => {
 
 
 export default class PointEdit extends SmartView {
-  constructor(point, destinationsAll, offersAll, citiesAll, callbackClose) {
+  constructor(point, destinationsAll, offersAll, citiesAll, closeCallback) {
     super();
 
     this._currentCity = point.destination.name;
@@ -200,7 +200,8 @@ export default class PointEdit extends SmartView {
     this._prevData = PointEdit.parsePointToData(point);
     this._dateFromPicker = null;
     this._dateToPicker = null;
-    this._callbackClose = callbackClose;
+    this._closeCallback = closeCallback;
+
 
     this._offers = offersAll;
     this._destinations = destinationsAll;
@@ -220,36 +221,15 @@ export default class PointEdit extends SmartView {
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
+    this.setCloseClickHandler(this._closeCallback);
 
     this._setInnerHandlers();
     this._setDatepicker();
-  }
-
-  removeElement() {
-    super.removeElement();
-
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-  }
-
-  reset(point) {
-    this.updateData(
-      PointEdit.parsePointToData(point),
-    );
   }
 
   getTemplate() {
     const offersTypeMain = getOffersArray(this._offers, this._data.type);
     return createEditingFormTemplate(this._data, this._cities, offersTypeMain );
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this._setDatepicker();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setDatepicker() {
@@ -288,20 +268,6 @@ export default class PointEdit extends SmartView {
     }
   }
 
-  _dateFromChangeHandler([userDate]) {
-    this.updateData({
-      dateFrom: userDate,
-    });
-    this.setCloseClickHandler(this._callbackClose);
-  }
-
-  _dateToChangeHandler([userDate]) {
-    this.updateData({
-      dateTo: userDate,
-    });
-    this.setCloseClickHandler(this._callbackClose);
-  }
-
   _setInnerHandlers() {
     const collectionTypeElements = this.getElement().querySelectorAll('.event__type-label');
     collectionTypeElements.forEach((item) => item.addEventListener('click', this._typeToggleHandler));
@@ -320,29 +286,87 @@ export default class PointEdit extends SmartView {
     dateToElement.addEventListener('change', this._dateToLimitHandler);
   }
 
-  _dateToLimitHandler(evt){
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._formCloseClickHandler);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
+  reset(point) {
+    this.updateData(
+      PointEdit.parsePointToData(point),
+    );
+    this.setCloseClickHandler(this._closeCallback);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setDatepicker();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  _dateFromChangeHandler([userDate]) {
+    this.updateData({
+      dateFrom: userDate,
+    });
+
+    this.setCloseClickHandler(this._closeCallback);
+  }
+
+  _dateToChangeHandler([userDate]) {
+    this._dateToLimitHandler(userDate);
+    this.updateData({
+      dateTo: userDate,
+    });
+
+    this.setCloseClickHandler(this._closeCallback);
+  }
+
+  _dateToLimitHandler(userDate){
+    const  dateToElement = this.getElement().querySelector('.event__input--end-time');
     const dateFromElement = this.getElement().querySelector('.event__input--start-time');
 
-    if (dayjs(evt.target.value) < dayjs(dateFromElement.value)){
-      evt.target.value = dateFromElement.value;
-      evt.target.style.border = 'solid 2px red';
-      evt.target.style.backgroundColor = '#FFB6C1';
+    if (dayjs(dateToElement.value) < dayjs(dateFromElement.value)){
+      dateToElement.style.border = 'solid 2px red';
+      dateToElement.style.backgroundColor = '#FFB6C1';
+      return false;
     }
     else {
-      evt.target.style.border = 'none';
-      evt.target.style.backgroundColor = 'white';
+      dateToElement.style.border = 'none';
+      dateToElement.style.backgroundColor = 'white';
+      return true;
     }
+
   }
 
   _typeToggleHandler(evt) {
     const offersType = getOffersArray(this._offers, evt.target.dataset.type);
-
     this.updateData({
       type: evt.target.dataset.type,
       offers: [],
       isOffers: offersType.length !== 0 ,
     });
-    this.setCloseClickHandler(this._callbackClose);
+
+    this.setCloseClickHandler(this._closeCallback);
 
   }
 
@@ -364,11 +388,13 @@ export default class PointEdit extends SmartView {
         offers : this._data.offers.filter((offer) => titleData !== offer.title),
       });
     }
-    this.setCloseClickHandler(this._callbackClose);
+
+    this.setCloseClickHandler(this._closeCallback);
   }
 
   _destinationChangeHandler(evt) {
     let destination = getDestinationsArray(this._destinations, evt.target.value);
+
     if (destination === undefined) {
       destination = getDestinationsArray(this._destinations, this._currentCity);
     }
@@ -385,8 +411,8 @@ export default class PointEdit extends SmartView {
         isPictures: destination.pictures.length !== 0,
       });
     }
-    this.setCloseClickHandler(this._callbackClose);
 
+    this.setCloseClickHandler(this._closeCallback);
   }
 
   _destinationClickHandler(evt) {
@@ -395,12 +421,10 @@ export default class PointEdit extends SmartView {
   }
 
   _priceToggleHandler(evt) {
-    evt.preventDefault();
     replacer(evt.target);
     this.updateData({
       basePrice: Number(evt.target.value),
-    });
-    this.setCloseClickHandler(this._callbackClose);
+    }, true);
   }
 
   _formSubmitHandler(evt) {
@@ -412,19 +436,22 @@ export default class PointEdit extends SmartView {
       destinationElement.style.border = 'solid 2px red';
       destinationElement.value = 'Выберите город из списка';
     }
-    else{
+    if (this._dateToLimitHandler()){
       this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
     }
-
   }
 
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PointEdit.parseDataToPoint(this._data));
+  }
+
+  _formCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
   }
 
   static parsePointToData(point) {
-
     return Object.assign(
       {},
       point,
@@ -459,30 +486,6 @@ export default class PointEdit extends SmartView {
     delete data.isDeleting;
 
     return data;
-  }
-
-  _formCloseClickHandler(evt){
-    evt.preventDefault();
-    this.updateData(
-      this._prevData,
-    );
-
-    this._callback.closeClick(evt);
-  }
-
-  setCloseClickHandler(callback) {
-    this._callback.closeClick = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._formCloseClickHandler);
-  }
-
-  _formDeleteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.deleteClick(PointEdit.parseDataToPoint(this._data));
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
 }

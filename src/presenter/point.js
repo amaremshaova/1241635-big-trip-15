@@ -17,10 +17,11 @@ export const State = {
 };
 
 export default class Point {
-  constructor(pointListContainer, changeData, changeMode) {
+  constructor(pointListContainer, changeData, changeMode, addPointButton) {
     this._pointListContainer = pointListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._addPointButton = addPointButton;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -30,7 +31,7 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
-
+    this._handleCloseClick = this._handleCloseClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
 
   }
@@ -45,14 +46,14 @@ export default class Point {
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
-    this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities, this._handleCloseClick);
+    this._pointComponent = new PointView(point, this._addPointButton);
+    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -124,14 +125,9 @@ export default class Point {
     }
   }
 
-  _handleCloseClick() {
-    this._replaceFormToCard();
-
-  }
-
   _replaceCardToForm() {
-
     replace(this._pointEditComponent, this._pointComponent);
+
 
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
@@ -139,7 +135,6 @@ export default class Point {
   }
 
   _replaceFormToCard() {
-
     replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
@@ -147,15 +142,22 @@ export default class Point {
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      this._handleCloseClick(evt);
+      evt.preventDefault();
+      this._replaceFormToCard();
     }
   }
 
+  _handleCloseClick() {
+    this._replaceFormToCard();
+  }
+
   _handleEditClick() {
-    this._replaceCardToForm();
     if (!isOnline()) {
       toast('You can\'t edit point offline');
     }
+
+    this._pointEditComponent.reset(this._point);
+    this._replaceCardToForm();
   }
 
   _handleFavoriteClick() {

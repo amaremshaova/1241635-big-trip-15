@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 import { getDuration } from '../utils/point.js';
 
 
@@ -50,11 +50,13 @@ const createPointTripTemplate = (point) => {
 </li>`;
 };
 
-export default class PointTrip extends AbstractView{
+export default class Point extends SmartView{
 
-  constructor(point) {
+  constructor(point, addPointButton) {
     super();
     this._point = point;
+
+    this._addPointButton = addPointButton;
 
     this._editClickHandler = this._editClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -66,6 +68,7 @@ export default class PointTrip extends AbstractView{
 
   _editClickHandler(evt) {
     evt.preventDefault();
+    this._addPointButton.disabled = false;
     this._callback.editClick();
   }
 

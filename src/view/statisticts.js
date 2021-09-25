@@ -1,21 +1,27 @@
 import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { OFFER_TYPE } from '../const.js';
 import { countPointsInMoneyRange, countPointsInTypesRange, countPointsInTimesSpendRange} from '../utils/statisticts.js';
 import { getDuration } from '../utils/point.js';
 
 const renderMoneyChart = (moneyCtx, points) =>{
 
+  const types = [];
+  const money = [];
+
   const pointInMoneyRangeCounts = countPointsInMoneyRange(points);
+  pointInMoneyRangeCounts.forEach((point) => {
+    types.push(point.type);
+    money.push(point.money);
+  });
 
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: OFFER_TYPE,
+      labels:  types,
       datasets: [{
-        data: pointInMoneyRangeCounts,
+        data: money,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -78,15 +84,23 @@ const renderMoneyChart = (moneyCtx, points) =>{
 
 const renderTypesChart = (typesCtx, points) => {
 
+  const types = [];
+  const countPoints = [];
+
   const pointInTypesRangeCounts = countPointsInTypesRange(points);
+  pointInTypesRangeCounts.forEach((point) => {
+    types.push(point.type);
+    countPoints.push(point.countPoints);
+  });
+
 
   return new Chart(typesCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: OFFER_TYPE,
+      labels: types,
       datasets: [{
-        data: pointInTypesRangeCounts,
+        data: countPoints,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -148,15 +162,23 @@ const renderTypesChart = (typesCtx, points) => {
 
 const renderTimeSpendChart = (timeSpendCtx, points) => {
 
+  const types = [];
+  const timesSpend = [];
+
   const pointInTimesSpendRangeCounts = countPointsInTimesSpendRange(points);
+
+  pointInTimesSpendRangeCounts.forEach((point) => {
+    types.push(point.type);
+    timesSpend.push(point.timeSpend);
+  });
 
   return new Chart(timeSpendCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: OFFER_TYPE,
+      labels: types,
       datasets: [{
-        data: pointInTimesSpendRangeCounts,
+        data: timesSpend,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -249,7 +271,7 @@ export default class Statistics extends SmartView {
   removeElement() {
     super.removeElement();
 
-    if (this._moneyCart !== null || this._typesChart !== null) {
+    if (this._moneyChart !== null || this._typesChart !== null) {
       this._moneyChart = null;
       this._typesChart = null;
     }

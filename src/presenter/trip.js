@@ -12,12 +12,13 @@ import {filter} from '../utils/filter.js';
 import {getCostTrip} from '../utils/get-cost.js';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel, api) {
+  constructor(tripContainer, pointsModel, filterModel, api, addPointButton) {
 
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
 
     this._tripContainer = tripContainer;
+    this._addPointButton = addPointButton;
 
     this._pointPresenter = new Map();
     this._filterType = FilterType.EVERYTHING;
@@ -61,6 +62,7 @@ export default class Trip {
   }
 
   createPoint(newPointButton) {
+    this._newPointButton = newPointButton;
     const noPointElement = this._tripContainer.querySelector('.trip-events__msg');
     if (noPointElement !== null) {
       replace(this._pointListComponent, this._noPointComponent);
@@ -209,7 +211,7 @@ export default class Trip {
   _renderPoint(point){
 
     const pointPresenter = new PointPresenter(this._pointListComponent,
-      this._handleViewAction, this._handleModeChange);
+      this._handleViewAction, this._handleModeChange, this._addPointButton);
     pointPresenter.init(point, this._destinations, this._offers, this._cities);
 
     this._pointPresenter.set(point.id, pointPresenter);

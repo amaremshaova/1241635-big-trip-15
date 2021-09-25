@@ -16,7 +16,7 @@ const getWeightForNullDate = (dateA, dateB) => {
   return null;
 };
 
-const getWeightForSort = (durationPointA, durationPointB) =>{
+export const getWeightForSort = (durationPointA, durationPointB) =>{
   if (durationPointA < durationPointB) {
     return 1;
   }
@@ -94,12 +94,12 @@ export const getDuration = (duration) =>{
   if ((Number(days) === 0) && (Number(hours) === 0)){
     return `${minutes}M`;
   }
+
   if (Number(days) === 0){
     return `${hours}H ${minutes}M`;
   }
-  else {
-    return `${days}D ${hours}H ${minutes}M`;
-  }
+
+  return `${days}D ${hours}H ${minutes}M`;
 };
 
 
