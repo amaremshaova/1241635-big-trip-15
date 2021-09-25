@@ -192,6 +192,7 @@ export default class Point {
 
     if (!isOnline()) {
       toast('You can\'t delete point offline');
+      this._pointEditComponent.shake();
       return;
     }
 
