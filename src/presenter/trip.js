@@ -276,6 +276,9 @@ export default class Trip {
       return;
     }
 
+    remove(this._noPointComponent);
+    remove(this._infoTripComponent);
+
     this._infoData = this._parseInfoData(points);
     this._renderInfo();
 

@@ -354,8 +354,6 @@ export default class PointEdit extends SmartView {
     dateToElement.style.border = 'none';
     dateToElement.style.backgroundColor = 'white';
     return true;
-
-
   }
 
   _typeToggleHandler(evt) {
@@ -399,8 +397,13 @@ export default class PointEdit extends SmartView {
       destination = getDestinationsArray(this._destinations, this._currentCity);
     }
 
-    if (this._cities.filter((city) => city === evt.target.value).length === 0){
+    if (this._cities.filter((city) => city === evt.target.value).length === 0
+    && evt.target.value === ''){
       evt.target.style.border = 'solid 2px red';
+      this.updateData({
+        isDestination: false,
+      });
+      this.shake();
     }
     else{
       evt.target.style.border = 'none';
@@ -435,10 +438,12 @@ export default class PointEdit extends SmartView {
       const destinationElement = this.getElement().querySelector('.event__input--destination');
       destinationElement.style.border = 'solid 2px red';
       destinationElement.value = 'Выберите город из списка';
+      this.shake();
     }
-    if (this._dateToLimitHandler()){
+    if (this._dateToLimitHandler() && this._data.isDestination){
       this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
     }
+
   }
 
   _formDeleteClickHandler(evt) {
