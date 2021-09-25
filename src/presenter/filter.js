@@ -20,6 +20,32 @@ export default class Filter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
+  _getFilters() {
+    const points = this._pointsModel.getPoints();
+    return [
+      {
+        type: FilterType.EVERYTHING,
+        name: 'everything',
+        count: filter[FilterType.EVERYTHING](points).length,
+      },
+      {
+        type: FilterType.FUTURE,
+        name: 'future',
+        count: filter[FilterType.FUTURE](points).length,
+      },
+      {
+        type: FilterType.PAST,
+        name: 'past',
+        count: filter[FilterType.PAST](points).length,
+      },
+      {
+        type: FilterType.FAVORITES,
+        name: 'favorites',
+        count: filter[FilterType.FAVORITES](points).length,
+      },
+    ];
+  }
+
   init() {
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
@@ -47,33 +73,5 @@ export default class Filter {
     }
 
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
-  }
-
-  _getFilters() {
-    const points = this._pointsModel.getPoints();
-
-
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'everything',
-        count: filter[FilterType.EVERYTHING](points).length,
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'future',
-        count: filter[FilterType.FUTURE](points).length,
-      },
-      {
-        type: FilterType.PAST,
-        name: 'past',
-        count: filter[FilterType.PAST](points).length,
-      },
-      {
-        type: FilterType.FAVORITES,
-        name: 'favorites',
-        count: filter[FilterType.FAVORITES](points).length,
-      },
-    ];
   }
 }

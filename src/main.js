@@ -14,12 +14,14 @@ import {toast} from './utils/toast.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
 
-const AUTHORIZATION = 'Basic er883jdzbdw';
+const AUTHORIZATION = 'Basic er883jdzbre';
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const STORE_PREFIX = 'bigTrip-localstorage';
 const STORE_VER = 'v15';
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const STORE_POINTS_NAME = `${STORE_PREFIX}-${STORE_VER}-points`;
+const STORE_DESTINATIONS_NAME = `${STORE_PREFIX}-${STORE_VER}-destinations`;
+const STORE_OFFERS_NAME = `${STORE_PREFIX}-${STORE_VER}-offers`;
 
 const headerMainElement = document.querySelector('.trip-main');
 const headerNavigationElement = headerMainElement.querySelector('.trip-controls__navigation');
@@ -29,8 +31,10 @@ const addPointButton = document.querySelector('.trip-main__event-add-btn');
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const store = new Store(STORE_NAME, window.localStorage);
-const apiWithProvider = new Provider(api, store);
+const storePoints = new Store(STORE_POINTS_NAME, window.localStorage);
+const storeDestinations = new Store(STORE_DESTINATIONS_NAME, window.localStorage);
+const storeOffers = new Store(STORE_OFFERS_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, storePoints, storeDestinations, storeOffers);
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
@@ -41,6 +45,12 @@ const filterPresenter = new FilterPresenter(headerFiltersElement, filterModel, p
 let statisticsComponent = null;
 
 const handleAddPointBtnClick = (evt) => {
+
+  if (!isOnline()) {
+    toast('You can\'t create new point offline');
+    siteMenuComponent.setItemMenu(MenuItem.TABLE);
+    return;
+  }
   siteMenuComponent.setItemMenu(MenuItem.TABLE);
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   evt.target.disabled = true;
@@ -49,11 +59,6 @@ const handleAddPointBtnClick = (evt) => {
   tripPresenter.destroy();
   tripPresenter.init();
   tripPresenter.createPoint(evt.target);
-
-  if (!isOnline()) {
-    toast('You can\'t create new point offline');
-    siteMenuComponent.setItemMenu(MenuItem.TABLE);
-  }
 
 };
 
@@ -114,15 +119,15 @@ apiWithProvider.getPoints()
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
 
-/*window.addEventListener('load', () => {
+window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
-});*/
+});
 
-/*window.addEventListener('online', () => {
+window.addEventListener('online', () => {
   document.title = document.title.replace(' [offline]', '');
   apiWithProvider.sync();
 });
 
 window.addEventListener('offline', () => {
   document.title += ' [offline]';
-});*/
+});

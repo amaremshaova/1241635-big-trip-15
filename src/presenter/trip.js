@@ -45,6 +45,37 @@ export default class Trip {
     this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
   }
 
+  _getOffers() {
+    return this._pointsModel.getOffers();
+  }
+
+  _getDestinations() {
+    return this._pointsModel.getDestinations();
+  }
+
+  _getPoints() {
+    this._filterType = this._filterModel.getFilter();
+    const points = this._pointsModel.getPoints();
+
+    const filtredPoints = filter[this._filterType](points);
+
+
+    switch (this._currentSortType) {
+      case SortType.TIME:
+        return filtredPoints.sort(sortPointTime);
+      case SortType.PRICE:
+        return filtredPoints.sort(sortPointPrice);
+      case SortType.DAY:
+        return filtredPoints.sort(sortPointDay);
+    }
+
+    return filtredPoints;
+  }
+
+  _getCities(destinations){
+    return destinations.map((item) => item.name);
+  }
+
   init() {
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -83,34 +114,6 @@ export default class Trip {
       endDate: points.length !== 0 ? points[0].dateTo : '',
       cost: points.length !== 0 ? getCostTrip(points) : '',
     };
-  }
-
-  _getOffers() {
-
-    return this._pointsModel.getOffers();
-  }
-
-  _getDestinations() {
-    return this._pointsModel.getDestinations();
-  }
-
-  _getPoints() {
-    this._filterType = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints();
-
-    const filtredPoints = filter[this._filterType](points);
-
-
-    switch (this._currentSortType) {
-      case SortType.TIME:
-        return filtredPoints.sort(sortPointTime);
-      case SortType.PRICE:
-        return filtredPoints.sort(sortPointPrice);
-      case SortType.DAY:
-        return filtredPoints.sort(sortPointDay);
-    }
-
-    return filtredPoints;
   }
 
   _handleModeChange() {
@@ -217,10 +220,6 @@ export default class Trip {
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
-  _getCities(destinations){
-    return destinations.map((item) => item.name);
-  }
-
   _renderPoints(points) {
     points.forEach((point) => this._renderPoint(point));
   }
@@ -269,13 +268,12 @@ export default class Trip {
     if (pointCount === 0) {
       remove(this._sortComponent);
       remove(this._infoTripComponent);
+
+      if (this._noPointComponent) {
+        remove(this._noPointComponent);
+      }
       this._renderNoPoints();
       return;
-    }
-
-    if (this._noPointComponent) {
-      remove(this._noPointComponent);
-      remove(this._infoTripComponent);
     }
 
     this._infoData = this._parseInfoData(points);

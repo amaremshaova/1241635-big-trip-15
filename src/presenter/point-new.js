@@ -2,7 +2,8 @@ import PointEditView from '../view/point-edit.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
 import { BLANK_POINT } from '../const.js';
-
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 
 export default class PointNew {
   constructor(pointListContainer, changeData) {
@@ -17,6 +18,26 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+
+  }
+
   init(newPointButton, destinations, offers, cities) {
     this._newPointButton = newPointButton;
 
@@ -27,7 +48,6 @@ export default class PointNew {
     this._pointEditComponent = new PointEditView(BLANK_POINT,  destinations, offers, cities,  this._handleCloseClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCloseClick);
-    //this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this._escKeyDownHandler);
@@ -44,30 +64,13 @@ export default class PointNew {
 
   }
 
-  setSaving() {
-    this._pointEditComponent.updateData({
-      isDisabled: true,
-      isSaving: true,
-    });
-  }
-
-  setAborting() {
-
-    const resetFormState = () => {
-      this._pointEditComponent.updateData({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    this._pointEditComponent.shake(resetFormState);
-
-  }
-
   _handleFormSubmit(point) {
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      this._pointEditComponent.shake();
+      return;
+    }
     this._newPointButton.disabled = false;
-
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,

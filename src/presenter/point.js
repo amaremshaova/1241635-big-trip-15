@@ -36,62 +36,6 @@ export default class Point {
 
   }
 
-  init(point, destinations, offers, cities) {
-    this._point = point;
-    this._offers = offers;
-    this._destinations = destinations;
-    this._cities = this.uniqueCities(cities);
-    this._handleCloseClick = this._handleCloseClick.bind(this);
-
-    const prevPointComponent = this._pointComponent;
-    const prevPointEditComponent = this._pointEditComponent;
-
-    this._pointComponent = new PointView(point, this._addPointButton);
-    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities);
-
-    this._pointComponent.setEditClickHandler(this._handleEditClick);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
-    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
-
-    if (prevPointComponent === null || prevPointEditComponent === null) {
-      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
-      return;
-    }
-
-    if (this._mode === Mode.DEFAULT) {
-      replace(this._pointComponent, prevPointComponent);
-    }
-
-    if (this._mode === Mode.EDITING) {
-      replace(this._pointComponent, prevPointEditComponent);
-      this._mode = Mode.DEFAULT;
-    }
-
-    remove(prevPointComponent);
-    remove(prevPointEditComponent);
-
-
-  }
-
-  uniqueCities(cities){
-    const set = new Set(cities);
-    return Array.from(set);
-  }
-
-  destroy() {
-    remove(this._pointComponent);
-    remove(this._pointEditComponent);
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._replaceFormToCard();
-    }
-  }
-
-
   setViewState(state) {
     if (this._mode === Mode.DEFAULT) {
       return;
@@ -125,6 +69,59 @@ export default class Point {
     }
   }
 
+  init(point, destinations, offers, cities) {
+    this._point = point;
+    this._offers = offers;
+    this._destinations = destinations;
+    this._cities = this.uniqueCities(cities);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
+
+    const prevPointComponent = this._pointComponent;
+    const prevPointEditComponent = this._pointEditComponent;
+
+    this._pointComponent = new PointView(point, this._addPointButton);
+    this._pointEditComponent = new PointEditView(point, this._destinations, this._offers, this._cities, this._handleCloseClick);
+
+    this._pointComponent.setEditClickHandler(this._handleEditClick);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
+
+    if (prevPointComponent === null || prevPointEditComponent === null) {
+      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    if (this._mode === Mode.DEFAULT) {
+      replace(this._pointComponent, prevPointComponent);
+    }
+
+    if (this._mode === Mode.EDITING) {
+      replace(this._pointComponent, prevPointEditComponent);
+      this._mode = Mode.DEFAULT;
+    }
+
+    remove(prevPointComponent);
+    remove(prevPointEditComponent);
+  }
+
+  uniqueCities(cities){
+    const set = new Set(cities);
+    return Array.from(set);
+  }
+
+  destroy() {
+    remove(this._pointComponent);
+    remove(this._pointEditComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceFormToCard();
+    }
+  }
+
   _replaceCardToForm() {
     replace(this._pointEditComponent, this._pointComponent);
 
@@ -154,6 +151,7 @@ export default class Point {
   _handleEditClick() {
     if (!isOnline()) {
       toast('You can\'t edit point offline');
+      return;
     }
 
     this._pointEditComponent.reset(this._point);
@@ -178,6 +176,7 @@ export default class Point {
 
     if (!isOnline()) {
       toast('You can\'t save point offline');
+      this._pointEditComponent.shake();
       return;
     }
 

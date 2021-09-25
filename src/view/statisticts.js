@@ -5,7 +5,6 @@ import { countPointsInMoneyRange, countPointsInTypesRange, countPointsInTimesSpe
 import { getDuration } from '../utils/point.js';
 
 const renderMoneyChart = (moneyCtx, points) =>{
-
   const types = [];
   const money = [];
 
@@ -268,19 +267,6 @@ export default class Statistics extends SmartView {
     this._setCharts();
   }
 
-  removeElement() {
-    super.removeElement();
-
-    if (this._moneyChart !== null || this._typesChart !== null) {
-      this._moneyChart = null;
-      this._typesChart = null;
-    }
-  }
-
-  restoreHandlers() {
-    this._setCharts();
-  }
-
   getTemplate() {
     return createStatisticsTemplate();
   }
@@ -300,6 +286,19 @@ export default class Statistics extends SmartView {
     this._moneyChart = renderMoneyChart(moneyCtx, points);
     this._typeChart = renderTypesChart(typesCtx, points);
     this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, points);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._moneyChart !== null || this._typesChart !== null) {
+      this._moneyChart = null;
+      this._typesChart = null;
+    }
+  }
+
+  restoreHandlers() {
+    this._setCharts();
   }
 
 }

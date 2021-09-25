@@ -341,7 +341,7 @@ export default class PointEdit extends SmartView {
     this.setCloseClickHandler(this._closeCallback);
   }
 
-  _dateToLimitHandler(userDate){
+  _dateToLimitHandler(){
     const  dateToElement = this.getElement().querySelector('.event__input--end-time');
     const dateFromElement = this.getElement().querySelector('.event__input--start-time');
 
@@ -350,11 +350,11 @@ export default class PointEdit extends SmartView {
       dateToElement.style.backgroundColor = '#FFB6C1';
       return false;
     }
-    else {
-      dateToElement.style.border = 'none';
-      dateToElement.style.backgroundColor = 'white';
-      return true;
-    }
+
+    dateToElement.style.border = 'none';
+    dateToElement.style.backgroundColor = 'white';
+    return true;
+
 
   }
 
